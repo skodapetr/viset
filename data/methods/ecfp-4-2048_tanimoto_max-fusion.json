@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "id": "ecfp-4-2048_tanimoto_max-fusion",
+    "label": "ECFP-4 2048 bits, Tanimoto, max-fusion",
+    "description": "Use ECFP fingerprint with Tanimoto and max-fusion strategy.",
+    "version": 1
+  },
+  "user_interface": {
+    "input": {
+      "actives.sdf": {
+        "label": "Active molecules"
+      },
+      "database.sdf": {
+        "label": "Library to screen"
+      }
+    },
+    "output": {
+      "scores.json": {
+        "label": "Molecular score"
+      }
+    }
+  },
+  "workflow": [
+    {
+      "id": "rdkit/ecfp",
+      "type": "representation",
+      "ports": {
+        "database_file": "input/actives.sdf",
+        "output_file": "working/actives.json"
+      },
+      "configuration": {
+        "radius": 4,
+        "nBits": 2048
+      }
+    },
+    {
+      "id": "rdkit/ecfp",
+      "type": "representation",
+      "ports": {
+        "database_file": "input/database.sdf",
+        "output_file": "working/database.json"
+      },
+      "configuration": {
+        "radius": 4,
+        "nBits": 2048
+      }
+    },
+    {
+      "id": "rdkit/tanimoto",
+      "type": "similarity",
+      "ports": {
+        "query_file": "working/actives.json",
+        "database_file": "working/database.json",
+        "output_file": "working/similarity.json"
+      }
+    },
+    {
+      "id": "max-fusion",
+      "type": "fusion",
+      "ports": {
+        "database_file": "working/similarity.json",
+        "database_file": "working/similarity.json",
+        "output_file": "output/scores.json"
+      }
+    }
+  ]
+}
