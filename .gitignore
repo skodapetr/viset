@@ -7,7 +7,7 @@ __pycache__/
 *$py.class
 
 # Project data directory:
-data/
+data/executions
 
 # NodeJs modules:
 node_modules/
