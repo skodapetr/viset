@@ -7,7 +7,6 @@ import {MethodList} from "../method/list/method-list-view";
 import {MethodDetail} from "../method/detail/method-detail-view";
 import {ApplicationLayout} from "./layout";
 
-// TODO Add page for 404.
 export function createRoutes() {
     return (
         <Route path="/" component={ApplicationLayout}>
@@ -21,4 +20,12 @@ export function createRoutes() {
     );
 }
 
-// TODO Tutorial for navigation https://codesandbox.io/s/mZRjw05yp
+export const getExecutionsPath = () => "execution";
+
+export const getExecutionCreatePath = () => "execution/create";
+
+export const getExecutionDetailPath = (id) => "execution/" + id;
+
+export const getMethodsPath = () => "method";
+
+export const getMethodDetailPath = (id) => "method/" + id;
