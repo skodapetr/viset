@@ -1,0 +1,21 @@
+{
+  "workflow": [
+    {
+      "id": "write-to-file",
+      "configuration": {
+        "text": "file content"
+      },
+      "ports": {
+        "output": "working/data.dat"
+      }
+    },
+    {
+      "id": "copy-file",
+      "configuration": {},
+      "ports": {
+        "input": "working/data.dat",
+        "output": "output/output.dat"
+      }
+    }
+  ]
+}

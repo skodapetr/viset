@@ -1,0 +1,24 @@
+{
+  "workflow": [
+    {
+      "id": "do-nothing",
+      "configuration": {
+        "order" : 1
+      },
+      "ports": {
+        "input": "input/connected_plugins.json",
+        "output": "working/transfer.dat"
+      }
+    },
+    {
+      "id": "do-nothing-2",
+      "configuration": {
+        "order" : 2
+      },
+      "ports": {
+        "input": "working/transfer.dat",
+        "output": "output/output.dat"
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "workflow": [
+    {
+      "id": "do-nothing",
+      "configuration": {
+        "value" : 2
+      },
+      "ports": {
+        "output": "output.dat"
+      }
+    }
+  ]
+}
