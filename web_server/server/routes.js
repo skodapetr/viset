@@ -1,4 +1,4 @@
-// TODO Add error handling.
+"use strict";
 
 const express = require("express");
 const multiparty = require("multiparty");
@@ -6,10 +6,12 @@ const executions = require("./execution-service");
 const methods = require("./methods-service");
 const io = require("./io-utils");
 
-const router = express.Router();
-addMethodsRoutes(router);
-addExecutionRoutes(router);
-module.exports = router;
+(function initialize() {
+    const router = express.Router();
+    addMethodsRoutes(router);
+    addExecutionRoutes(router);
+    module.exports = router;
+})();
 
 // TODO Handle promise failures.
 // TODO Split routes into files and introduce index.js as an aggregation.

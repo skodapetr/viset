@@ -1,3 +1,5 @@
+"use strict";
+
 const fs = require("fs");
 const io = require("./io-utils");
 const methods = require("./methods-service");
@@ -28,10 +30,12 @@ module.exports = {
     "onExecutionFinished": onExecutionFinished,
     "getMethodDirectory": getMethodDirectory,
     "getMethodWorkflowPath": (executionId, methodId) => {
-        return getMethodDirectory(executionId, methodId) + "/workflow.json";
+        return getMethodDirectory(executionId, methodId) +
+            "/workflow.json";
     },
     "getOutputResourcePath": (executionId, methodId, fileName) => {
-        return getMethodDirectory(executionId, methodId) + "/output/" + fileName;
+        return getMethodDirectory(executionId, methodId) +
+            "/output/" + fileName;
     },
     "initializeExecution": initializeExecution
 };
@@ -165,7 +169,7 @@ function initializeExecution(reference, methodIds) {
     return methodIds.reduce((prev, methodId) => {
         const method = methods.get(methodId);
         executionMethods[method["metadata"]["id"]] = createMethodObject(method);
-        return prev.then(() => addMethodWorkflowFile(reference["path"], method));
+        return prev.then(() => addWorkflowFile(reference["path"], method));
     }, Promise.resolve()).then(() => {
         const indexRecord = new IndexRecord({
             "id": reference["id"],
@@ -184,7 +188,7 @@ function createMethodObject(method) {
     }
 }
 
-function addMethodWorkflowFile(executionDirectory, method) {
+function addWorkflowFile(executionDirectory, method) {
     const directory = executionDirectory + "/methods/" + method["metadata"]["id"];
     return io.mkdirAsynch(directory)
     .then(() => io.mkdirAsynch(directory + "/working"))

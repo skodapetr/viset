@@ -1,3 +1,5 @@
+"use strict";
+
 const exec = require("child_process").exec;
 const executions = require("./execution-service.js");
 
@@ -7,7 +9,7 @@ const executor = {
     "running": []
 };
 
-(function initializeExecutor() {
+(function initialize() {
     scheduleNextCheck();
 })();
 
@@ -20,6 +22,7 @@ function executorCheck() {
     const list = executions.list();
     for (let index in list) {
         const record = list[index];
+        // TODO: Enable
         // checkExecutionForQueuedMethods(record);
     }
     scheduleNextCheck();
