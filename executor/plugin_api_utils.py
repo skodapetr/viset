@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Utility module visible to plugins.
+This module is part of plugin API.
 """
 
 __license__ = "X11"
@@ -9,7 +9,7 @@ __license__ = "X11"
 
 class RdkitUtils(object):
     """
-    Shared utilities for working with RDKit.
+    RDKit based utilities.
     """
 
     @staticmethod
