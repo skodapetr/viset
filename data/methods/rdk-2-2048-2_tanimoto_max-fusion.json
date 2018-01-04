@@ -61,7 +61,6 @@
       "type": "fusion",
       "ports": {
         "database_file": "working/similarity.json",
-        "database_file": "working/similarity.json",
         "output_file": "output/scores.json"
       }
     }
