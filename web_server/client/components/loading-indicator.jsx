@@ -1,13 +1,14 @@
 import React from "react";
 
 export const LoadingIndicator = () => (
-    <div>
+    <div style={{"textAlign": "center"}}>
         Loading ...
     </div>
 );
 
+// TODO Create new function that would understand how to work with repository entity.
+
 export function addLoadingIndicator(WrappedComponent) {
-    // TODO Can we extract this as standalone function/class ?
     return (props) => {
         if (props.isLoading) {
             return (
@@ -20,5 +21,3 @@ export function addLoadingIndicator(WrappedComponent) {
         }
     };
 }
-
-// TODO Update to use fetchData property to request data fetch and then wait till the "data' are available.

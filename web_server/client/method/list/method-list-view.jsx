@@ -1,32 +1,26 @@
 import React from "react";
 import {connect} from "react-redux";
-import {clearMethodList, fetchMethodList} from "./../method-action";
-import {selectListLoading, selectListData} from "./../method-reducer";
+import {fetchMethods} from "./../method-action";
+import {methodListSelector} from "./../method-reducer";
+import {isLoadingSelector, dataSelector} from "./../../service/repository";
 import {Link} from "react-router";
 import {addLoadingIndicator} from "./../../components/loading-indicator";
+import {FilteredItemList} from "./../../components/filtered-item-list";
+import {Container} from "reactstrap";
 
-// TODO Add property specification.
-const MethodItem = ({method}) => (
+const MethodItem = ({data}) => (
     <div className="list-group-item flex-column align-items-start">
         <h5 className="mb-1">
-            <Link to={"/method/" + method.id}>{method.label}</Link>
+            <Link to={"/method/" + data.id}>{data.label}</Link>
         </h5>
         <p className="mb-1">
-            {method.description}
+            {data.description}
         </p>
     </div>
 );
 
-// TODO Add property specification.
-const MethodListComponent = addLoadingIndicator(({methods}) => (
-    <div className="list-group">
-        {methods.map((method) => (
-            <MethodItem key={method.id} method={method}/>
-        ))}
-    </div>
-));
+const LoadingAwareItemList = addLoadingIndicator(FilteredItemList);
 
-// TODO Add auto refresh functionality.
 class MethodListContainer extends React.Component {
 
     componentDidMount() {
@@ -34,25 +28,31 @@ class MethodListContainer extends React.Component {
     }
 
     render() {
-        const {loading, methods} = this.props;
+        const data = this.props.data;
         return (
-            <MethodListComponent isLoading={loading} methods={methods}/>
+            <Container>
+                <LoadingAwareItemList
+                    isLoading={isLoadingSelector(data)}
+                    data={dataSelector(data)}
+                    keySelector={item => item.id}
+                    itemComponent={MethodItem}
+                    filterPredicate={searchPredicate}
+                />
+            </Container>
         );
-    }
-
-    componentWillUnmount() {
-        this.props.clearData();
     }
 
 }
 
+function searchPredicate(query, item) {
+    return item.label.toUpperCase().search(query) > -1;
+}
+
 export const MethodList = connect(
     (state, ownProps) => ({
-        "loading": selectListLoading(state),
-        "methods": selectListData(state)
+        "data": methodListSelector(state)
     }),
     (dispatch, ownProps) => ({
-        "fetchData": () => dispatch(fetchMethodList()),
-        "clearData": () => dispatch(clearMethodList())
+        "fetchData": () => dispatch(fetchMethods())
     }))
 (MethodListContainer);

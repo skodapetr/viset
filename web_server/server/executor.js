@@ -22,8 +22,7 @@ function executorCheck() {
     const list = executions.list();
     for (let index in list) {
         const record = list[index];
-        // TODO: Enable
-        // checkExecutionForQueuedMethods(record);
+        checkExecutionForQueuedMethods(record);
     }
     scheduleNextCheck();
 }
@@ -53,10 +52,11 @@ function getRunningIdForExecutionAndMethod(executionId, methodId) {
 
 function startExecution(executionId, methodId) {
     const path = executions.getMethodDirectory(executionId, methodId);
-    const command = "python execute_workflow.py " +
+    const command = "python executor.py " +
         "--plugins ./../plugins " +
-        "--workflow " + path + " " +
+        "--workflow " + path + "/workflow.json " +
         "--input ./../../input " +
+        "--working " + path +
         " > " + path + "/stdout.log" +
         " 2> " + path + "/stderr.log";
     // TODO Move path to configuration.

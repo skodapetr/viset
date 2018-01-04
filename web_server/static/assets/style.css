@@ -1,0 +1,10 @@
+/* Global style customization. */
+
+.nav-tabs .nav-link.disabled {
+    background-color: #F4F4F4 ;
+}
+
+.nav-tabs .nav-link {
+    border-color: #DDDDDD ;
+}
+

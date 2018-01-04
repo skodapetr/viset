@@ -2,14 +2,15 @@
   "name": "lbvs-environment",
   "version": "0.0.1",
   "description": "LBVS environment webserver",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/skodapetr/viset.git"
+  },
   "main": "server.js",
   "author": "",
   "scripts": {},
   "license": "X11",
   "dependencies": {
-    "babel-cli": "^6.24.0",
-    "babel-core": "^6.24.0",
-    "babel-loader": "^6.4.1",
     "babel-plugin-recharts": "^1.1.0",
     "babel-plugin-transform-define": "^1.3.0",
     "babel-preset-es2015": "^6.24.0",
@@ -33,9 +34,15 @@
     "redux": "^3.6.0",
     "redux-form": "^7.0.3",
     "redux-thunk": "^2.2.0",
-    "thunk": "0.0.1",
+    "reselect": "^3.0.1",
+    "rimraf": "^2.6.2",
+    "thunk": "0.0.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
     "webpack": "^2.3.3",
     "webpack-dev-middleware": "^1.10.1"
-  },
-  "devDependencies": {}
+  }
 }

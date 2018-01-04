@@ -20,12 +20,12 @@ export function createRoutes() {
     );
 }
 
-export const getExecutionsPath = () => "execution";
+export const getExecutionsPath = () => "/execution";
 
-export const getExecutionCreatePath = () => "execution/create";
+export const getExecutionCreatePath = () => "/execution/create";
 
-export const getExecutionDetailPath = (id) => "execution/" + id;
+export const getExecutionDetailPath = (id) => "/execution/" + id;
 
-export const getMethodsPath = () => "method";
+export const getMethodsPath = () => "/method";
 
-export const getMethodDetailPath = (id) => "method/" + id;
+export const getMethodDetailPath = (id) => "/method/" + id;

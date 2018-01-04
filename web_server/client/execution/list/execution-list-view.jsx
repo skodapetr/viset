@@ -1,9 +1,16 @@
 import React from "react";
 import {Link} from "react-router";
 import {connect} from "react-redux";
-import {fetchExecutionList, clearExecutionList} from "./../execution-action";
-import {ExecutionListComponent} from "./execution-list";
-import {selectListLoading, selectListData} from "./../execution-reducer";
+import {isLoadingSelector, dataSelector} from "./../../service/repository";
+import {executionListSelector} from "./../execution-reducer";
+import {addLoadingIndicator} from "./../../components/loading-indicator";
+import {FilteredItemList} from "./../../components/filtered-item-list";
+import {getExecutionCreatePath} from "./../../application/navigation";
+import {fetchExecutions} from "./../execution-action";
+import {ExecutionItem} from "./execution-list-item";
+import {Container} from "reactstrap";
+
+const LoadingAwareItemList = addLoadingIndicator(FilteredItemList);
 
 class ExecutionListContainer extends React.Component {
 
@@ -12,35 +19,35 @@ class ExecutionListContainer extends React.Component {
     }
 
     render() {
-        const {loading, executions} = this.props;
-        // TODO Extract HTML into another component and made this pure container.
+        const data = this.props.data;
         return (
-            <div>
-                <ExecutionListComponent isLoading={loading}
-                                        executions={executions}/>
-                <br/>
-                <Link to={"/execution/create"}>Create new execution</Link>
-            </div>
-        )
+            <Container>
+                <LoadingAwareItemList
+                    isLoading={isLoadingSelector(data)}
+                    data={dataSelector(data)}
+                    keySelector={item => item.id}
+                    itemComponent={ExecutionItem}
+                    filterPredicate={searchPredicate}
+                />
+                <div style={{"marginTop": "1REM", "marginBottom": "2REM"}}>
+                    <Link to={getExecutionCreatePath()}>
+                        Create new execution
+                    </Link>
+                </div>
+            </Container>
+        );
     }
-
-    componentWillUnmount() {
-        this.props.clearData();
-    }
-
 }
 
-const mapStateToProps = (state, ownProps) => ({
-    "loading": selectListLoading(state),
-    "executions": selectListData(state)
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-    "fetchData": () => dispatch(fetchExecutionList()),
-    "clearData": () => dispatch(clearExecutionList())
-});
+function searchPredicate(query, item) {
+    return item.label.toUpperCase().search(query) > -1;
+}
 
 export const ExecutionList = connect(
-    mapStateToProps,
-    mapDispatchToProps)
+    (state, ownProps) => ({
+        "data": executionListSelector(state)
+    }),
+    (dispatch, ownProps) => ({
+        "fetchData": () => dispatch(fetchExecutions())
+    }))
 (ExecutionListContainer);

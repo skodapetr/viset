@@ -1,6 +1,7 @@
 "use strict";
 
 const fs = require("fs");
+const rimraf = require("rimraf");
 
 module.exports = {
     "streamToFile": streamToFile,
@@ -9,7 +10,8 @@ module.exports = {
     "stringToFile": stringToFile,
     "jsonToFile": jsonToFile,
     "mkdirAsynch": mkdirAsynch,
-    "fileToJson": fileToJson
+    "fileToJson": fileToJson,
+    "deleteDirectory": deleteDirectory
 };
 
 function streamToFile(stream, path) {
@@ -60,4 +62,17 @@ function callbackToPromise(fulfill, reject) {
 
 function fileToJson(path) {
     return JSON.parse(fs.readFileSync(path, "utf8"));
+}
+
+function deleteDirectory(path) {
+    return new Promise((fulfill, reject) => {
+        const options = {"disableGlob" : true};
+        rimraf(path, options, (error) => {
+            if (error) {
+                reject(error);
+            } else {
+                fulfill();
+            }
+        });
+    });
 }

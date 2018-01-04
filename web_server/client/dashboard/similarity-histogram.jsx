@@ -1,20 +1,21 @@
 import React from "react";
 import {PropTypes} from "prop-types";
+import {BaseDashboard} from "./base-dashboard";
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip} from "recharts";
 
-function createLabel(label) {
-    const value = parseFloat(label) - 0.05;
-    return value.toFixed(2) + " - " + label;
-}
+class HistogramComponent extends React.Component {
 
-export class HistogramComponent extends React.Component {
+    constructor(props) {
+        super(props);
+        this.createHistogram = this.createHistogram.bind(this);
+    }
 
     render() {
-        const data = this.createHistogram(this.props.unfilteredData);
+        const data = this.createHistogram(this.props.data);
         return (
             <BarChart width={500} height={300} data={data}>
                 <XAxis dataKey="label" type="category" padding={{"left": 10}}/>
-                <YAxis type="number"/>
+                <YAxis type="number" domain={[0, this.props.data.length]}/>
                 <CartesianGrid strokeDasharray="3 3"/>
                 <Tooltip labelFormatter={createLabel}/>
                 <Bar dataKey="count" fill="#8884d8"/>
@@ -31,7 +32,6 @@ export class HistogramComponent extends React.Component {
                 "count": 0
             })
         }
-
         const step = 1.0 / 20;
         for (let index in data) {
             const value = data[index].value;
@@ -43,6 +43,24 @@ export class HistogramComponent extends React.Component {
 
 }
 
+function createLabel(label) {
+    const value = parseFloat(label) - 0.05;
+    return value.toFixed(2) + " - " + label;
+}
+
 HistogramComponent.propTypes = {
-    "unfilteredData": PropTypes.arrayOf(PropTypes.any).isRequired
+    "data": PropTypes.array.isRequired
 };
+
+export const SimilarityHistogramDashboard = (props) => {
+    const {execution, selection, onToggleSelection} = props;
+    return (
+        <BaseDashboard
+            execution={execution}
+            component={HistogramComponent}
+            selection={selection}
+            onToggleSelection={onToggleSelection}/>
+    )
+};
+
+

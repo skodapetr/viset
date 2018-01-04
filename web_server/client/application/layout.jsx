@@ -5,10 +5,12 @@ import {Header} from "./header";
 export class ApplicationLayout extends React.Component {
     render() {
         return (
-            <Container>
-                <Header/>
+            <div>
+                <Container>
+                    <Header/>
+                </Container>
                 {React.cloneElement(this.props.children, this.props)}
-            </Container>
+            </div>
         );
     }
 }

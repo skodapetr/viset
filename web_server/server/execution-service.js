@@ -25,6 +25,7 @@ const publicList = createPublicList(index);
 module.exports = {
     "list": () => publicList,
     "get": getExecutionData,
+    "delete": deleteExecution,
     "create": createExecution,
     "onExecutionWillStart": onExecutionWillStart,
     "onExecutionFinished": onExecutionFinished,
@@ -78,6 +79,7 @@ function createPublicIndexRecord(execution) {
     const methods = execution["methods"];
     return {
         "id": execution["id"],
+        "label": execution["label"],
         "methods": Object.keys(methods).map((key) => {
             const value = methods[key];
             return {
@@ -99,6 +101,26 @@ function getExecutionData(id) {
     return method["data"];
 }
 
+function deleteExecution(id) {
+    deleteFromIndex(id);
+    deleteFromPublicList(id);
+    const path = getExecutionsDirectory() + id;
+    return io.deleteDirectory(path);
+}
+
+function deleteFromIndex(id) {
+    delete index[id];
+}
+
+function deleteFromPublicList(id) {
+    for (let index in publicList) {
+        if (publicList[index]["id"] === id) {
+            publicList.splice(index, 1);
+            return;
+        }
+    }
+}
+
 function createExecution() {
     const id = createUniqueId();
     const path = getExecutionsDirectory() + id;
@@ -117,14 +139,15 @@ function createUniqueId() {
 }
 
 function createRandomId() {
-    return "xxxx-xxxx".replace(/[xy]/g, function (c) {
+    const timePrefix = (new Date()).getTime();
+    return timePrefix + "-xxxx-xxxx".replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }
 
 function onExecutionWillStart(executionId, methodId) {
-    console.log("onExecutionWillStart", executionId, methodId);
+    console.log("onExecutionWillStart: ", executionId, methodId);
     return updateExecutionMethod(executionId, methodId, (method) => {
         method["status"] = "running";
         method["start"] = getCurrentTimeAsXsdTime();
@@ -157,24 +180,22 @@ function updatePublicList(execution) {
 }
 
 function onExecutionFinished(executionId, methodId, status) {
-    console.log("onExecutionFinished", executionId, methodId, "with", status);
+    console.log("onExecutionFinished: ", executionId, methodId, "with", status);
     return updateExecutionMethod(executionId, methodId, (method) => {
         method["status"] = status;
         method["finish"] = getCurrentTimeAsXsdTime();
     });
 }
 
-function initializeExecution(reference, methodIds) {
+function initializeExecution(reference, methodIds, executionInfo) {
     const executionMethods = {};
     return methodIds.reduce((prev, methodId) => {
         const method = methods.get(methodId);
         executionMethods[method["metadata"]["id"]] = createMethodObject(method);
         return prev.then(() => addWorkflowFile(reference["path"], method));
     }, Promise.resolve()).then(() => {
-        const indexRecord = new IndexRecord({
-            "id": reference["id"],
-            "methods": executionMethods
-        }, reference["path"]);
+        const indexRecord = createExecutionRecord(
+            reference, executionMethods, executionInfo);
         return addToIndex(indexRecord);
     });
 }
@@ -194,6 +215,15 @@ function addWorkflowFile(executionDirectory, method) {
     .then(() => io.mkdirAsynch(directory + "/working"))
     .then(() => io.mkdirAsynch(directory + "/output"))
     .then(() => io.jsonToFile(method, directory + "/workflow.json"));
+}
+
+function createExecutionRecord(reference, executionMethods, executionInfo) {
+    return new IndexRecord({
+        "id": reference["id"],
+        "label": executionInfo["label"],
+        "description": executionInfo["description"],
+        "methods": executionMethods
+    }, reference["path"]);
 }
 
 function addToIndex(indexRecord) {

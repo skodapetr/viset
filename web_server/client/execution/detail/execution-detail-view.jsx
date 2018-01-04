@@ -1,131 +1,99 @@
 import React from "react";
 import {connect} from "react-redux";
-import {
-    fetchExecutionDetail,
-    clearExecutionDetail
-} from "./../execution-action";
-import {selectDetailLoading, selectDetailMethods} from "./../execution-reducer";
-import {addLoadingIndicator} from "./../../components/loading-indicator";
-import {MethodExecutionDetail} from "./execution-method-detail";
-import {DashboardContainer} from "./../../dashboard/dashboard-container";
-import {TabContent, TabPane, Nav, NavItem, NavLink} from "reactstrap";
-import classnames from "classnames";
-import {ItemDetail} from "./../../item-detail/item-detail";
-import {TableVisualization} from "./../../visualizations/table-visualization"
-import {HistogramComponent} from "./../../visualizations/histogram-visualisation"
-
-// TODO Add general overview.
-// TODO Change into tab layout.
-const ExecutionMethodsList = addLoadingIndicator(({methods, executionId, activeTab, updateActiveTab}) => (
-    <div>
-        <h4>Execution detail</h4>
-        <br/>
-        <h5>Methods</h5>
-        {Object.keys(methods).map((key) => (
-            <MethodExecutionDetail key={key} execution={methods[key]}/>
-        ))}
-        <br/>
-        <Nav tabs>
-            <NavItem>
-                <NavLink
-                    className={classnames({"active": activeTab === "1"})}
-                    onClick={() => {
-                        updateActiveTab("1")
-                    }}>
-                    Results
-                </NavLink>
-            </NavItem>
-            <NavItem>
-                <NavLink
-                    className={classnames({"active": activeTab === "2"})}
-                    onClick={() => {
-                        updateActiveTab("2")
-                    }}>
-                    Histograms
-                </NavLink>
-            </NavItem>
-            <NavItem>
-                <NavLink
-                    className={classnames({"active": activeTab === "3"})}
-                    onClick={() => {
-                        updateActiveTab("3")
-                    }}>
-                    Molecule detail
-                </NavLink>
-            </NavItem>
-        </Nav>
-        <TabContent activeTab={activeTab}>
-            <TabPane tabId="1">
-                <br/>
-                <DashboardContainer
-                    showFilter={true}
-                    executionId={executionId}
-                    component={TableVisualization}
-                    methodsId={Object.keys(methods).filter((id) => methods[id].status === "finished")}/>
-            </TabPane>
-            <TabPane tabId="2">
-                <DashboardContainer
-                    showFilter={false}
-                    executionId={executionId}
-                    component={HistogramComponent}
-                    methodsId={Object.keys(methods).filter((id) => methods[id].status === "finished")}/>
-            </TabPane>
-            <TabPane tabId="3">
-                <ItemDetail
-                    executionId={executionId}
-                    methodsId={Object.keys(methods).filter((id) => methods[id].status === "finished")}/>
-            </TabPane>
-        </TabContent>
-
-
-    </div>
-));
+import {fetchExecution, clearExecution} from "./../execution-action";
+import {executionDetailSelector} from "./../execution-reducer";
+import {LoadingIndicator} from "./../../components/loading-indicator";
+import {ExecutionDetailDashboard} from "./../../dashboard/execution-detail";
+import {ScoreItemListDashboard} from "./../../dashboard/score-item-list/score-item-list";
+import {isLoadingSelector, dataSelector} from "./../../service/repository";
+import {isExecutionFinished, deleteExecution} from "./../execution-api";
+import {Tabs} from "./../../components/tab";
+import {ScoreItemDetailDashboard} from "./../../dashboard/score-item-detail";
+import {toggleSelection, clearSelection} from "./execution-detail-action";
+import {sharedSelectionSelector} from "./execution-detail-reducer";
+import {clearOutputs} from "./../../output/output-action";
+import {destroyFilter} from "./../../components/filter/filter-action";
+import {destroyMethods} from "./../../dashboard/score-item-list/score-item-list-action";
+import {SimilarityHistogramDashboard} from "./../../dashboard/similarity-histogram";
+import {push} from "react-router-redux";
 
 class ExecutionDetail extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {"activeTab": "1"};
-        this.updateActiveTab = this.updateActiveTab.bind(this);
-    }
-
-    updateActiveTab(tab) {
-        if (this.state.activeTab !== tab) {
-            this.setState({"activeTab": tab});
-        }
     }
 
     componentDidMount() {
-        this.props.fetchData(this.props.params.id);
+        this.props.initialize(this.props.params.id);
     }
 
     render() {
-        const {loading, methods, params} = this.props;
+        const isLoading = isLoadingSelector(this.props.execution);
+        if (isLoading) {
+            return (
+                <div>
+                    <LoadingIndicator/>
+                </div>
+            )
+        }
+        const execution = dataSelector(this.props.execution);
+        const isFinished = isExecutionFinished(execution);
         return (
-            <ExecutionMethodsList
-                isLoading={loading}
-                methods={methods}
-                executionId={params.id}
-                activeTab={this.state.activeTab}
-                updateActiveTab={this.updateActiveTab}
-            />
+            <Tabs>
+                <ExecutionDetailDashboard
+                    execution={execution}
+                    label={"Details"}
+                    enabled={true}
+                    onDelete={this.props.onDelete}/>
+                <ScoreItemListDashboard
+                    execution={execution}
+                    label={"Results list"}
+                    enabled={isFinished}
+                    selection={this.props.selection}
+                    onToggleSelection={this.props.toggleSelection}/>
+                <ScoreItemDetailDashboard
+                    execution={execution}
+                    label={"Selection detail"}
+                    enabled={isFinished}
+                    selection={this.props.selection}
+                    onToggleSelection={this.props.toggleSelection}/>
+                <SimilarityHistogramDashboard
+                    execution={execution}
+                    label={"Similarity histogram"}
+                    enabled={isFinished}
+                    selection={this.props.selection}
+                    onToggleSelection={this.props.toggleSelection}/>
+            </Tabs>
         );
     }
 
     componentWillUnmount() {
-        this.props.clearData();
+        this.props.destroy(this.props.params.id);
     }
 
 }
 
 export const ExecutionDetailView = connect(
     (state, ownProps) => ({
-        "loading": selectDetailLoading(state),
-        "methods": selectDetailMethods(state)
+        "execution": executionDetailSelector(state, ownProps.params.id),
+        "selection": sharedSelectionSelector(state)
     }),
     (dispatch, ownProps) => ({
-        "fetchData": (id) => dispatch(fetchExecutionDetail(id)),
-        "clearData": () => dispatch(clearExecutionDetail)
+        "initialize": (id) => {
+            dispatch(fetchExecution(id));
+        },
+        "destroy": (id) => {
+            dispatch(clearExecution(id));
+            dispatch(clearOutputs());
+            dispatch(destroyFilter("base-dashboard"));
+            dispatch(destroyMethods());
+            dispatch(clearSelection());
+        },
+        "toggleSelection": (item) => dispatch(toggleSelection(item)),
+        "onDelete": () => {
+            deleteExecution(ownProps.params.id).then(() => {
+                dispatch(push("/execution"));
+            });
+        }
     }))
 (ExecutionDetail);

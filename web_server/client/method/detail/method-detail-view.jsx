@@ -1,45 +1,44 @@
 import React from "react";
 import {connect} from "react-redux";
-import {fetchMethodDetail, clearMethodsDetail} from "./../method-action";
-import {selectDetailLoading, selectDetailData} from "./../method-reducer";
+import {fetchMethod, clearMethodsDetail} from "./../method-action";
+import {isLoadingSelector, dataSelector} from "./../../service/repository";
+import {methodDetailSelector} from "./../method-reducer";
 import {addLoadingIndicator} from "./../../components/loading-indicator";
+import {Container} from "reactstrap";
 
-// TODO Add property specification.
-const MethodDetailComponent = addLoadingIndicator(({method}) => (
+const MethodDetailComponent = addLoadingIndicator(({data}) => (
     <div>
-        <p><b>ID:</b> {method.metadata.id}</p>
-        <p><b>Label:</b> {method.metadata.label}</p>
-        <p><b>Description:</b> {method.metadata.description}</p>
+        <p><b>ID:</b> {data.metadata.id}</p>
+        <p><b>Label:</b> {data.metadata.label}</p>
+        <p><b>Description:</b> {data.metadata.description}</p>
     </div>
 ));
 
 class MethodDetailContainer extends React.Component {
 
     componentDidMount() {
-        // TODO Check if the data are not already loaded.
         this.props.fetchData(this.props.params.id);
     }
 
     render() {
-        const {loading, method} = this.props;
+        const data = this.props.data;
         return (
-            <MethodDetailComponent isLoading={loading} method={method}/>
+            <Container>
+                <MethodDetailComponent
+                    isLoading={isLoadingSelector(data)}
+                    data={dataSelector(data)}
+                />
+            </Container>
         )
-    }
-
-    componentWillUnmount() {
-        this.props.clearData();
     }
 
 }
 
 export const MethodDetail = connect(
     (state, ownProps) => ({
-        "loading": selectDetailLoading(state, ownProps.params.id),
-        "method": selectDetailData(state, ownProps.params.id)
+        "data": methodDetailSelector(state, ownProps.params.id)
     }),
     (dispatch, ownProps) => ({
-        "fetchData": (id) => dispatch(fetchMethodDetail(id)),
-        "clearData": () => dispatch(clearMethodsDetail())
+        "fetchData": (id) => dispatch(fetchMethod(id))
     }))
 (MethodDetailContainer);

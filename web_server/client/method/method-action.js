@@ -1,78 +1,64 @@
 import {fetchJsonAndDispatch} from "./../service/data-access";
+import {shouldNotBeFetchedSelector} from "./../service/repository";
 
-export const CLEAR_METHOD_LIST = "CLEAR_METHOD_LIST";
+// TODO Add support for clear action for methods.
+
 export const FETCH_METHOD_LIST_REQUEST = "FETCH_METHOD_PAGE_REQUEST";
 export const FETCH_METHOD_LIST_SUCCESS = "FETCH_METHOD_PAGE_SUCCESS";
 
-export const CLEAR_METHODS_DETAILS = "CLEAR_METHOD_DETAIL";
 export const FETCH_METHOD_DETAIL_REQUEST = "FETCH_METHOD_DETAIL_REQUEST";
 export const FETCH_METHOD_DETAIL_SUCCESS = "FETCH_METHOD_DETAIL_SUCCESS";
 
-// TODO Add support for fail action.
-
-export function clearMethodList() {
-    return {
-        "type": CLEAR_METHOD_LIST
-    };
-}
-
-export function fetchMethodList() {
-    // TODO Add check for loading.
-    return (dispatch) => {
-        dispatch(fetchMethodListRequest());
+export function fetchMethods() {
+    return (dispatch, getStatus) => {
+        const entity = getStatus().method.list;
+        if (shouldNotBeFetchedSelector(entity)) {
+            console.log("Ignoring fetch for method list.");
+            return;
+        }
+        dispatch(fetchMethodsRequest());
         const url = "/api/v1/resources/methods";
-        fetchJsonAndDispatch(url, dispatch, fetchMethodListSuccess);
+        fetchJsonAndDispatch(url, dispatch, fetchMethodsSuccess);
     };
 }
 
-function fetchMethodListRequest() {
+function fetchMethodsRequest() {
     return {
         "type": FETCH_METHOD_LIST_REQUEST,
     };
 }
 
-function fetchMethodListSuccess(data) {
+function fetchMethodsSuccess(data) {
     return {
         "type": FETCH_METHOD_LIST_SUCCESS,
         "data": data
     }
 }
 
-export function clearMethodsDetail() {
-    return {
-        "type": CLEAR_METHODS_DETAILS
-    };
-}
-
-// TODO Introduce to global level.
-const methodFetchingList = {};
-
-export function fetchMethodDetail(id) {
-    // TODO Add check for loading.
-    return (dispatch) => {
-        if (methodFetchingList[id] !== undefined) {
+export function fetchMethod(id) {
+    return (dispatch, getStatus) => {
+        const entity = getStatus().method.details[id];
+        if (shouldNotBeFetchedSelector(entity)) {
+            console.log("Ignoring fetch for method detail.");
             return;
         }
-        dispatch(fetchMethodDetailRequest(id));
+        dispatch(fetchMethodRequest(id));
         const url = "/api/v1/resources/methods/" + id;
-        fetchJsonAndDispatch(url, dispatch, fetchMethodDetailSuccess);
+        fetchJsonAndDispatch(url, dispatch, fetchMethodSuccess);
     };
 }
 
-function fetchMethodDetailRequest(id) {
-    methodFetchingList[id] = 1;
+function fetchMethodRequest(id) {
     return {
         "type": FETCH_METHOD_DETAIL_REQUEST,
         "id": id
     };
 }
 
-function fetchMethodDetailSuccess(data) {
-    const id = data["metadata"]["id"];
-    methodFetchingList[id] = undefined;
+function fetchMethodSuccess(data) {
     return {
         "type": FETCH_METHOD_DETAIL_SUCCESS,
-        "id": id,
+        "id": data["metadata"]["id"],
         "data": data
     }
 }

@@ -14,7 +14,6 @@ const io = require("./io-utils");
 })();
 
 // TODO Handle promise failures.
-// TODO Split routes into files and introduce index.js as an aggregation.
 
 function addMethodsRoutes(router) {
 
@@ -42,6 +41,12 @@ function addExecutionRoutes(router) {
         res.status(200).json(executions.get(req.params.id));
     });
 
+    router.delete("/executions/:id", function (req, res) {
+        executions.delete(req.params.id)
+        .then(() => res.status(200).json({}))
+        .catch(error => res.status(500).json({"error": error}));
+    });
+
     router.get("/executions/:id/:method", function (req, res) {
         const params = req.params;
         const path = executions.getMethodWorkflowPath(
@@ -59,7 +64,6 @@ function addExecutionRoutes(router) {
 }
 
 function handleExecutionPost(req, res) {
-    console.log("start");
     executions.create().then((execution) => {
         return parserRequestToExecution(req, execution)
         .then(() => res.status(200).json({"id": execution["id"]}));
@@ -74,10 +78,15 @@ function parserRequestToExecution(req, execution) {
     return new Promise((fulfill, reject) => {
         const form = new multiparty.Form();
         let methodsString = "";
+        let executionInfoString = "";
         form.on("part", (part) => {
             if (part["name"] === "methods") {
                 part.on("data", function (chunk) {
                     methodsString += chunk;
+                });
+            } else if (part["name"] === "execution") {
+                part.on("data", function (chunk) {
+                    executionInfoString += chunk;
                 });
             } else if (part["name"] === "input" &&
                 part["filename"] !== undefined) {
@@ -89,9 +98,9 @@ function parserRequestToExecution(req, execution) {
             }
         });
         form.on("close", () => {
-            console.log("methodsString", methodsString);
             const methodIds = JSON.parse(methodsString);
-            executions.initializeExecution(execution, methodIds)
+            const executionInfo = JSON.parse(executionInfoString);
+            executions.initializeExecution(execution, methodIds, executionInfo)
             .then(fulfill)
             .catch(reject);
         });

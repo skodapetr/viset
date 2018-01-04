@@ -34,9 +34,13 @@ export class Header extends React.Component {
     constructor(props) {
         super(props);
         this.toggleNavbar = this.toggleNavbar.bind(this);
-        this.state = {
+        this.state = this.getInitialState();
+    }
+
+    getInitialState() {
+        return {
             "navbarOpen": false
-        };
+        }
     }
 
     toggleNavbar() {

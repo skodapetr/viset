@@ -1,2 +1,2 @@
-TITLE LBVS WebServer
+TITLE Viset - WebServer
 node server.js
