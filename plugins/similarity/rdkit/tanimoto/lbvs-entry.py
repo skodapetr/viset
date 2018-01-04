@@ -3,12 +3,12 @@
 
 import json
 from rdkit import DataStructs
-import methods_api
+import plugin_api
 
 __license__ = "X11"
 
 
-class LbvsEntry(methods_api.SimilarityInterface):
+class LbvsEntry(plugin_api.PluginInterface):
     """
     Compute Tanimoto similarity.
     """
@@ -18,11 +18,10 @@ class LbvsEntry(methods_api.SimilarityInterface):
         self.counter = 0
         self.first_entry = False
 
-    def compute_similarity(self, query_file: str, database_file: str,
-                           output_file: str):
-        query = LbvsEntry._load_file(query_file)
-        database = LbvsEntry._load_file(database_file)
-        with open(output_file, "w") as stream:
+    def execute(self, files):
+        query = LbvsEntry._load_file(files["query_file"])
+        database = LbvsEntry._load_file(files["database_file"])
+        with open(files["output_file"], "w") as stream:
             self.stream = stream
             self.write_output_header()
             self.compute_and_write_similarities_for_items(query, database)

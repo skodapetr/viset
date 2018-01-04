@@ -3,15 +3,16 @@
 
 import json
 from rdkit import Chem
-import methods_api
-import lbvs_utils
+import plugin_api
+from plugin_api_utils import RdkitUtils
+
 
 __license__ = "X11"
 
 
-class LbvsEntry(methods_api.RepresentationInterface):
+class LbvsEntry(plugin_api.PluginInterface):
     """
-    Compute RDKit extended-connectivity-fingerprints.
+    Compute RDKit fingerprints.
 
     Mandatory configuration:
     * maxPath
@@ -19,14 +20,14 @@ class LbvsEntry(methods_api.RepresentationInterface):
     * nBitsPerHash
     """
 
-    def create_representation(self, database_file: str, output_file: str):
+    def execute(self, files):
         reps = []
-        for molecule in lbvs_utils.RdkitUtils.load_molecules(database_file):
+        for molecule in RdkitUtils.load_molecules(files["database_file"]):
             reps.append({
                 "id": molecule.GetProp("_Name"),
                 "value": self._compute_representation(molecule)
             })
-        with open(output_file, "w") as stream:
+        with open(files["output_file"], "w") as stream:
             json.dump({
                 "data": reps
             }, stream)
