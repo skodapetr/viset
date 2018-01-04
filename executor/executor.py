@@ -45,9 +45,9 @@ def _read_args():
 
 
 def execute(args):
-    plugin_source = _create_source(args["plugins"])
+    plugin_source = _create_source(args.plugins)
     executor = _create_executor(plugin_source)
-    _execute_plugin(args["workflow"], args["working"], executor, args["input"])
+    _execute_plugin(args.workflow, args.working, executor, args.input)
 
 
 def _create_source(root_directory):
