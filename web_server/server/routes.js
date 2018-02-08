@@ -2,18 +2,36 @@
 
 const express = require("express");
 const multiparty = require("multiparty");
+const datasets = require("./dataset-service");
 const executions = require("./execution-service");
 const methods = require("./methods-service");
 const io = require("./io-utils");
 
 (function initialize() {
     const router = express.Router();
+    addExecutionAndCollectionsRoutes(router);
     addMethodsRoutes(router);
     addExecutionRoutes(router);
     module.exports = router;
 })();
 
 // TODO Handle promise failures.
+
+function addExecutionAndCollectionsRoutes(router) {
+
+    router.get("/datasets", function (req, res) {
+        res.status(200).json(datasets.datasetIndex());
+    });
+
+    router.get("/collections", function (req, res) {
+        res.status(200).json(datasets.collectionIndex());
+    });
+
+    router.get("/collections/:id", function (req, res) {
+        res.status(200).json(datasets.collection(req.params.id));
+    });
+
+}
 
 function addMethodsRoutes(router) {
 

@@ -8,7 +8,12 @@ import {
     NavItem
 } from "reactstrap";
 import {Link} from "react-router";
-import {getExecutionsPath, getMethodsPath} from "./navigation";
+import {
+    getExecutionsPath,
+    getMethodsPath,
+    getDatasetsPath,
+    getCollectionsPath
+} from "./navigation";
 
 const NavbarContent = () => (
     <Nav className="ml-auto" navbar>
@@ -24,6 +29,20 @@ const NavbarContent = () => (
                   className="nav-link"
                   activeClassName="active">
                 Methods
+            </Link>
+        </NavItem>
+        <NavItem>
+            <Link to={getDatasetsPath()}
+                  className="nav-link"
+                  activeClassName="active">
+                Datasets
+            </Link>
+        </NavItem>
+        <NavItem>
+            <Link to={getCollectionsPath()}
+                  className="nav-link"
+                  activeClassName="active">
+                Collections
             </Link>
         </NavItem>
     </Nav>
