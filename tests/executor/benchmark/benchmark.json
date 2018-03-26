@@ -1,0 +1,14 @@
+{
+  "benchmark": [
+    {
+      "dataset": "test_dataset",
+      "selection": "test_selection",
+      "group": "test_group"
+    },
+    {
+      "dataset": "test_dataset",
+      "selection": "test_selection",
+      "group": "test_group"
+    }
+  ]
+}

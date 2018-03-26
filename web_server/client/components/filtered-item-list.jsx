@@ -69,14 +69,26 @@ export class FilteredItemList extends React.Component {
     }
 
     render() {
-        return (
-            <div>
-                <SearchBar value={this.state.query}
-                           onChange={this.updateQuery}/>
+        let dataComponent;
+        if (this.state.data.length == 0) {
+            // TODO Add custom NoData component as a parameter.
+            dataComponent = (<div>
+                There are no data available.
+            </div>)
+        } else {
+            dataComponent = (
                 <ItemList
                     data={this.state.data}
                     keySelector={this.props.keySelector}
                     itemComponent={this.props.itemComponent}/>
+            );
+        }
+
+        return (
+            <div>
+                <SearchBar value={this.state.query}
+                           onChange={this.updateQuery}/>
+                {dataComponent}
             </div>
         )
     }

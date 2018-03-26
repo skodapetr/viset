@@ -1,5 +1,14 @@
 const path = require("path");
 
+(function initialize() {
+    const express = require("express");
+    const app = express();
+    initializeParsers(app);
+    initializeRoutes(app);
+    initializeWebpack(app);
+    startServer(app);
+})();
+
 function initializeParsers(app) {
     const bodyParser = require("body-parser");
     // Parse application/x-www-form-urlencoded.
@@ -44,10 +53,6 @@ function initializeRoutesForStaticResources(app) {
     });
 }
 
-function initializeServices() {
-    require("./server/executor.js");
-}
-
 function startServer(app) {
     const port = 8050;
     app.listen(port, function onStart(err) {
@@ -57,17 +62,4 @@ function startServer(app) {
         console.info("WebServer is listening on port: %s", port);
     });
 }
-
-(() => {
-    const express = require("express");
-    const app = express();
-    initializeParsers(app);
-    initializeRoutes(app);
-    initializeServices();
-    initializeWebpack(app);
-    startServer(app);
-})();
-
-
-
 

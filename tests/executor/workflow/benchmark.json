@@ -1,0 +1,41 @@
+{
+  "metadata": {
+    "id": "benchmark",
+    "label": ""
+  },
+  "user_interface": {},
+  "workflow": [
+    {
+      "id": "verify-input",
+      "ports": {
+        "input/actives": {
+          "file": "actives.sdf",
+          "type": "train-actives",
+          "dir": "input"
+        },
+        "input/inactives": {
+          "file": "inactives.sdf",
+          "type": "train-inactives",
+          "dir": "input"
+        },
+        "input/test": {
+          "file": "test.sdf",
+          "type": "test",
+          "dir": "input"
+        }
+      }
+    },
+    {
+      "id": "write-to-file",
+      "configuration": {
+        "text": "{\"data\" : [{\"id\": \"A0\", \"value\": 1}, {\"id\": \"DEC0\", \"value\": 0}]}"
+      },
+      "ports": {
+        "output": {
+          "file": "scores.json",
+          "dir": "output"
+        }
+      }
+    }
+  ]
+}

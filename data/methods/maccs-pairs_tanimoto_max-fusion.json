@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "id": "maccs_tanimoto_max-fusion",
+    "label": "MACCS, Tanimoto, max-fusion",
+    "description": "Use MACCS fingerprint with Tanimoto and max-fusion strategy.",
+    "version": 1
+  },
+  "user_interface": {
+    "input": {
+      "actives.sdf": {
+        "label": "Active molecules",
+        "hideForBenchmark": true
+      },
+      "database.sdf": {
+        "label": "Library to screen",
+        "hideForBenchmark": true
+      }
+    },
+    "output": {
+      "scores.json": {
+        "label": "Molecular score"
+      }
+    }
+  },
+  "workflow": [
+    {
+      "id": "rdkit/maccs",
+      "type": "representation",
+      "ports": {
+        "database_file": {
+          "file": "actives.sdf",
+          "dir": "input",
+          "type": "train-actives"
+        },
+        "output_file": {
+          "file": "actives.json",
+          "dir": "working"
+        }
+      }
+    },
+    {
+      "id": "rdkit/maccs",
+      "type": "representation",
+      "ports": {
+        "database_file": {
+          "file": "database.sdf",
+          "dir": "input",
+          "type": "test"
+        },
+        "output_file": {
+          "file": "database.json",
+          "dir": "working"
+        }
+      }
+    },
+    {
+      "id": "rdkit/tanimoto",
+      "type": "similarity",
+      "ports": {
+        "query_file": {
+          "file": "actives.json",
+          "dir": "working"
+        },
+        "database_file": {
+          "file": "database.json",
+          "dir": "working"
+        },
+        "output_file": {
+          "file": "similarity.json",
+          "dir": "working"
+        }
+      }
+    },
+    {
+      "id": "max-fusion",
+      "type": "fusion",
+      "ports": {
+        "database_file": {
+          "file": "similarity.json",
+          "dir": "working"
+        },
+        "output_file": {
+          "file": "scores.json",
+          "type": "scores",
+          "dir": "output"
+        }
+      }
+    }
+  ]
+}

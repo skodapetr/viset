@@ -1,0 +1,8 @@
+{
+  "benchmark": [
+    {
+      "dataset": "test_dataset",
+      "selection": "test_selection"
+    }
+  ]
+}

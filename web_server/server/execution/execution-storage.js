@@ -1,9 +1,9 @@
 "use strict";
 
 const fs = require("fs");
-const io = require("./io-utils");
-const methods = require("./methods-service");
+const io = require("./../io-utils");
 
+// Move to file that would be shared by execution and execution-factory ?
 class IndexRecord {
     constructor(execution, path) {
         this.id = execution["id"];
@@ -12,34 +12,31 @@ class IndexRecord {
     }
 }
 
-class ExecutionReference {
-    constructor(id, path) {
-        this.id = id;
-        this.path = path;
-    }
-}
-
-const index = buildIndex();
-const publicList = createPublicList(index);
-
 module.exports = {
+    "initialize": initialize,
     "list": () => publicList,
-    "get": getExecutionData,
+    "detail": getExecutionData,
     "delete": deleteExecution,
-    "create": createExecution,
+    //
+    "onNewExecution": onNewExecution,
     "onExecutionWillStart": onExecutionWillStart,
     "onExecutionFinished": onExecutionFinished,
-    "getMethodDirectory": getMethodDirectory,
-    "getMethodWorkflowPath": (executionId, methodId) => {
-        return getMethodDirectory(executionId, methodId) +
-            "/workflow.json";
-    },
-    "getOutputResourcePath": (executionId, methodId, fileName) => {
-        return getMethodDirectory(executionId, methodId) +
-            "/output/" + fileName;
-    },
-    "initializeExecution": initializeExecution
+    //
+    "getBenchmarkPath": getBenchmarkPath,
+    "getMethodSummaryPath": getMethodSummaryPath,
+    "getMethodWorkflowPath": getMethodWorkflowPath,
+    "getMethodErrorOutputPath": getMethodErrorOutputPath,
+    "getMethodStandardOutputPath": getMethodStandardOutputPath,
+    "getRunOutputPath": getRunOutputPath
 };
+
+let index;
+let publicList;
+
+function initialize() {
+    index = buildIndex();
+    publicList = createPublicList(index);
+}
 
 function buildIndex() {
     const index = {};
@@ -48,7 +45,7 @@ function buildIndex() {
         const path = executionDirectory + file;
         try {
             // TODO Extract path definition to function.
-            const execution = io.fileToJson(path + "/frontend.json");
+            const execution = io.fileToJson(path + "/frontend-index.json");
             const record = new IndexRecord(execution, path);
             index[record.id] = record;
         } catch (exception) {
@@ -63,7 +60,8 @@ function getExecutionsDirectory() {
 }
 
 function getMethodDirectory(executionId, methodId) {
-    return getExecutionsDirectory() + executionId + "/methods/" + methodId;
+    return getExecutionsDirectory() +
+        executionId + "/methods/" + methodId + "/";
 }
 
 function createPublicList(index) {
@@ -80,6 +78,7 @@ function createPublicIndexRecord(execution) {
     return {
         "id": execution["id"],
         "label": execution["label"],
+        "type": execution["type"],
         "methods": Object.keys(methods).map((key) => {
             const value = methods[key];
             return {
@@ -121,29 +120,9 @@ function deleteFromPublicList(id) {
     }
 }
 
-function createExecution() {
-    const id = createUniqueId();
-    const path = getExecutionsDirectory() + id;
-    return io.mkdirAsynch(path)
-    .then(() => io.mkdirAsynch(path + "/input"))
-    .then(() => io.mkdirAsynch(path + "/methods"))
-    .then(() => new ExecutionReference(id, path));
-}
-
-function createUniqueId() {
-    let id = createRandomId();
-    while (index[id] !== undefined) {
-        id = createRandomId();
-    }
-    return id;
-}
-
-function createRandomId() {
-    const timePrefix = (new Date()).getTime();
-    return timePrefix + "-xxxx-xxxx".replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+function onNewExecution(indexRecord) {
+    index[indexRecord["id"]] = indexRecord;
+    publicList.push(createPublicIndexRecord(indexRecord["data"]));
 }
 
 function onExecutionWillStart(executionId, methodId) {
@@ -160,7 +139,8 @@ function updateExecutionMethod(executionId, methodId, transformer) {
     const method = execution["methods"][methodId];
     transformer(method);
     updatePublicList(execution);
-    return io.jsonToFile(execution, indexRecord["path"] + "/frontend.json");
+    return io.jsonToFile(execution,
+        indexRecord["path"] + "/frontend-index.json");
 }
 
 function getCurrentTimeAsXsdTime() {
@@ -187,53 +167,32 @@ function onExecutionFinished(executionId, methodId, status) {
     });
 }
 
-function initializeExecution(reference, methodIds, executionInfo) {
-    const executionMethods = {};
-    return methodIds.reduce((prev, methodId) => {
-        const method = methods.get(methodId);
-        executionMethods[method["metadata"]["id"]] = createMethodObject(method);
-        return prev.then(() => addWorkflowFile(reference["path"], method));
-    }, Promise.resolve()).then(() => {
-        const indexRecord = createExecutionRecord(
-            reference, executionMethods, executionInfo);
-        return addToIndex(indexRecord);
-    });
+function getBenchmarkPath(executionId) {
+    return getExecutionsDirectory() + executionId + "/benchmark.json";
 }
 
-function createMethodObject(method) {
-    return {
-        "id": method["metadata"]["id"],
-        "label": method["metadata"]["label"],
-        // TODO Introduce constants for STATUS.
-        "status": "queued"
-    }
+function getMethodSummaryPath(executionId, methodId) {
+    return getMethodDirectory(executionId, methodId) + "summary.json";
 }
 
-function addWorkflowFile(executionDirectory, method) {
-    const directory = executionDirectory + "/methods/" + method["metadata"]["id"];
-    return io.mkdirAsynch(directory)
-    .then(() => io.mkdirAsynch(directory + "/working"))
-    .then(() => io.mkdirAsynch(directory + "/output"))
-    .then(() => io.jsonToFile(method, directory + "/workflow.json"));
+function getMethodWorkflowPath(executionId, methodId) {
+    return getMethodDirectory(executionId, methodId) + "workflow.json";
 }
 
-function createExecutionRecord(reference, executionMethods, executionInfo) {
-    return new IndexRecord({
-        "id": reference["id"],
-        "label": executionInfo["label"],
-        "description": executionInfo["description"],
-        "methods": executionMethods
-    }, reference["path"]);
+function getMethodErrorOutputPath(executionId, methodId) {
+    return getMethodDirectory(executionId, methodId) + "stderr.log";
 }
 
-function addToIndex(indexRecord) {
-    index[indexRecord["id"]] = indexRecord;
-    publicList.push(createPublicIndexRecord(indexRecord["data"]));
-    return writeFrontendFile(indexRecord);
+function getMethodStandardOutputPath(executionId, methodId) {
+    return getMethodDirectory(executionId, methodId) + "stdout.log";
 }
 
-function writeFrontendFile(indexRecord) {
-    // TODO Move file names to constants.
-    const frontendFilePath = indexRecord["path"] + "/frontend.json";
-    return io.jsonToFile(indexRecord["data"], frontendFilePath);
+function getRunDirectory(executionId, methodId, runId) {
+    return getMethodDirectory(executionId, methodId) + runId + "/";
 }
+
+function getRunOutputPath(executionId, methodId, runId, fileName) {
+    return getRunDirectory(executionId, methodId, runId) +
+        "/output/" + fileName;
+}
+

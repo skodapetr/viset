@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+from rdkit import Chem
 from rdkit.Chem.AtomPairs import Pairs
 import plugin_api
 from plugin_api_utils import RdkitUtils
@@ -11,7 +12,7 @@ __license__ = "X11"
 
 class LbvsEntry(plugin_api.PluginInterface):
     """
-    Compute RDKit atom-pairs fingerprints.
+    Computes RDKit atom-pairs fingerprints.
     """
 
     def execute(self, files):
@@ -22,9 +23,7 @@ class LbvsEntry(plugin_api.PluginInterface):
                 "value": self._compute_representation(molecule)
             })
         with open(files["output_file"], "w") as stream:
-            json.dump({
-                "data": reps
-            }, stream)
+            json.dump({"data": reps}, stream)
 
     def _compute_representation(self, molecule):
         fp = Pairs.GetAtomPairFingerprint(molecule, **self.configuration)

@@ -34,11 +34,13 @@ export function createExecutionSummary(execution) {
     };
 }
 
+// Order represent priorities for grouping.
+
 function statusToNumber(status) {
     switch (status) {
-        case "queued":
-            return 0;
         case "running":
+            return 0;
+        case "queued":
             return 1;
         case "failed":
             return 2;
@@ -50,9 +52,9 @@ function statusToNumber(status) {
 function numberToStatus(status) {
     switch (status) {
         case 0:
-            return "queued";
-        case 1:
             return "running";
+        case 1:
+            return "queued";
         case 2:
             return "failed";
         case 3:

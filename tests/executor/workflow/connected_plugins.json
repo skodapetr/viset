@@ -1,23 +1,40 @@
 {
+  "metadata": {
+    "id": "connected-plugins",
+    "label": ""
+  },
   "workflow": [
     {
       "id": "do-nothing",
       "configuration": {
-        "order" : 1
+        "order": 1
       },
       "ports": {
-        "input": "input/connected_plugins.json",
-        "output": "working/transfer.dat"
+        "input": {
+          "file": "connected_plugins.json",
+          "dir": "input"
+        },
+        "output": {
+          "file": "transfer.dat",
+          "dir": "working"
+        }
       }
     },
     {
       "id": "do-nothing-2",
+      "label": "Second do nothing component",
       "configuration": {
-        "order" : 2
+        "order": 2
       },
       "ports": {
-        "input": "working/transfer.dat",
-        "output": "output/output.dat"
+        "input": {
+          "file": "transfer.dat",
+          "dir": "working"
+        },
+        "output": {
+          "file": "output.dat",
+          "dir": "output"
+        }
       }
     }
   ]

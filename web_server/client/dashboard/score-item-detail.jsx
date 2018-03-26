@@ -5,6 +5,7 @@ import {outputsDetailSelector} from "./../output/output-reducer";
 import {PropTypes} from "prop-types";
 import {dataSelector} from "./../service/repository";
 import {Container} from "reactstrap";
+import {executionMethodSelection} from "../execution/execution-reducer";
 
 const PropertyMap = ({data}) => (
     <div style={{"marginLeft": "2REM"}}>
@@ -42,6 +43,7 @@ export class ScoreItemDetail extends React.Component {
     }
 
     render() {
+        console.log(">", this.props.summaries);
         console.time("ScoreItemDetail.prepare");
         const selection = this.props.selection;
         const data = selection.map((key) => this.selectInfoForItem(key));
@@ -94,9 +96,17 @@ ScoreItemDetail.propTypes = {
 };
 
 export const ScoreItemDetailDashboard = connect(
-    (state, ownProps) => ({
-        "outputs": outputsDetailSelector(state)
-    }),
+    (state, ownProps) => {
+        let isLoaded = true;
+        const summaries = {};
+        Object.keys(ownProps.execution.methods).map(methodId => {
+            summaries[methodId] = executionMethodSelection(state, methodId);
+        });
+        return {
+            "outputs": outputsDetailSelector(state),
+            "summaries": summaries
+        }
+    },
     (dispatch, ownProps) => ({
         "initialize": () => {
             Object.keys(ownProps.execution.methods).forEach((key) => {

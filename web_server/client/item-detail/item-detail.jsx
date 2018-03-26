@@ -3,6 +3,7 @@ import {PropTypes} from "prop-types";
 import {connect} from "react-redux";
 import {selectDetailData} from "./../method/method-reducer";
 
+// TODO Rename
 class ItemDetailComponent extends React.Component {
 
     render() {

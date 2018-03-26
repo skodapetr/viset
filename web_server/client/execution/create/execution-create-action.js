@@ -1,4 +1,4 @@
-import {fetchMethod} from "./../../method/method-action"
+import {fetchMethod} from "./../../method/method-action";
 
 export const EXECUTION_CREATE_INITIALIZE = "EXECUTION_CREATE_INITIALIZE";
 export const TOGGLE_METHOD_SELECTION = "TOGGLE_METHOD_SELECTION";

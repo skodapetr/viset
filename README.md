@@ -5,7 +5,7 @@ focus on the methods of ligand/based virtual screening.
 ### Requirements and dependencies
 * Python 3.5
 * Node.js
-* RDKit (optional - required by core plugins)
+* RDKit
 
 ## Installation 
 As of now there is installation process, instead the ViSet can be used directly 
@@ -16,7 +16,7 @@ installed and that `python`, `npm` and `node` command are in the system
 path (can be started from the terminal).
 
 Before ViSet can be started it is necessary to install NodeJs libraries,
-using commands:
+using following commands:
 ```
 cd web_server
 npm install
@@ -29,4 +29,4 @@ cd web_server
 node server.js
 ```
 
-Now you can access the frontend on address `http://localhost:8050`. 
+Now you can access the frontend on address <http://localhost:8050>. 

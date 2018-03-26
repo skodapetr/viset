@@ -1,6 +1,7 @@
 import React from "react";
 import {Link} from "react-router";
-import {getDatasetDetailPath} from "./../../application/navigation"
+import {Badge} from "reactstrap";
+import {getDatasetDetailPath} from "./../../application/navigation";
 
 // Add badge for downloaded molecules
 // Add information about number of downloaded selections
@@ -12,7 +13,15 @@ export const DatasetItem = ({data}) => {
             <h5 className="mb-1">
                 <Link to={getDatasetDetailPath(data.id)}>{data.label}</Link>
             </h5>
-            {data.doi && <Link to={doiLink}>{data.doi}</Link>}
+            {data.doi &&
+            <a href={doiLink} target="_blank">{data.doi}</a>
+            }
+            { data.downloaded &&
+            <Badge color="info">Downloaded</Badge>
+            }
+            { data.downloading &&
+            <Badge color="warning">Downloading</Badge>
+            }
         </div>
     )
 };

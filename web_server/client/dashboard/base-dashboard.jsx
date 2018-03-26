@@ -125,16 +125,17 @@ function createReference(execution, method) {
 
 export const BaseDashboard = connect(
     (state, ownProps) => ({
-        "outputs": outputsDetailSelector(state),
+        // "outputs": outputsDetailSelector(state),
         "filter": filterDataSelector(state, ownProps.filtersId),
         "useFilter" : ownProps.filtersId !== undefined
     }),
     (dispatch, ownProps) => ({
         "initialize": () => {
-            Object.keys(ownProps.execution.methods).forEach((key) => {
-                const ref = createReference(ownProps.execution, key);
-                dispatch(fetchOutput(ref));
-            });
+            // FETCH OUTPUTS FOR ALL METHODS
+            // Object.keys(ownProps.execution.methods).forEach((key) => {
+            //     const ref = createReference(ownProps.execution, key);
+            //     dispatch(fetchOutput(ref));
+            // });
         }
     }))
 (ItemListDashboard);

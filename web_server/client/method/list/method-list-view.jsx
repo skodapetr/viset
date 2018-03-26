@@ -3,21 +3,10 @@ import {connect} from "react-redux";
 import {fetchMethods} from "./../method-action";
 import {methodListSelector} from "./../method-reducer";
 import {isLoadingSelector, dataSelector} from "./../../service/repository";
-import {Link} from "react-router";
+import {MethodItem} from "./method-list-item";
 import {addLoadingIndicator} from "./../../components/loading-indicator";
 import {FilteredItemList} from "./../../components/filtered-item-list";
 import {Container} from "reactstrap";
-
-const MethodItem = ({data}) => (
-    <div className="list-group-item flex-column align-items-start">
-        <h5 className="mb-1">
-            <Link to={"/method/" + data.id}>{data.label}</Link>
-        </h5>
-        <p className="mb-1">
-            {data.description}
-        </p>
-    </div>
-);
 
 const LoadingAwareItemList = addLoadingIndicator(FilteredItemList);
 
@@ -45,7 +34,8 @@ class MethodListContainer extends React.Component {
 }
 
 function searchPredicate(query, item) {
-    return item.label.toUpperCase().search(query) > -1;
+    return item.label.toUpperCase().search(query) > -1 ||
+        item.description.toUpperCase().search(query) > -1;
 }
 
 export const MethodList = connect(

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
+
 import os
 import tempfile
 import unittest
+import shutil
+import logging
 
-from localhost_executor import WorkflowExecutor
+from localhost_executor import LocalhostExecutor
 from plugin_api import PluginInterface, PluginSourceInterface
 
 __license__ = "X11"
@@ -12,17 +15,21 @@ __license__ = "X11"
 TEST_DIRECTORY = "./tests/executor/workflow/"
 
 
-class DoNothingPlugin(PluginInterface):
-    def __init__(self):
-        self.configuration = None
-        self.ports = None
+# TODO Export to plugins
 
-    def configure(self, configuration):
-        self.configuration = configuration
+class DoNothingPlugin(PluginInterface):
+
+    def get_metadata(self):
+        raise NotImplementedError
+
+    def __init__(self):
+        super().__init__()
+        self.ports = None
 
     def execute(self, ports):
         self.ports = ports
 
+# TODO Remove this class
 
 class SimplePluginSource(PluginSourceInterface):
     def __init__(self):
@@ -38,25 +45,25 @@ class SimplePluginSource(PluginSourceInterface):
         raise NotImplementedError("Please implement this method.")
 
 
-WORKING_DIRECTORY = WORKING_DIRECTORY = tempfile.mkdtemp("", "viset-test-")
+WORKING_DIRECTORY = tempfile.mkdtemp("", "viset-test-")
 
 
-class TestWorkflowExecutor(unittest.TestCase):
+class TestLocalhostExecutor(unittest.TestCase):
     plugin_source = SimplePluginSource()
 
     def test_execute_single_plugins(self):
-        executor = WorkflowExecutor()
+        executor = LocalhostExecutor()
         executor.set_plugin_storage(self.plugin_source)
         executor.execute(TEST_DIRECTORY + "single_plugin.json",
                          WORKING_DIRECTORY,
                          [])
         plugin = self.plugin_source.plugins["do-nothing"]
         self.assertEqual({"value": 2}, plugin.configuration)
-        self.assertEqual(os.path.join(WORKING_DIRECTORY, "output.dat"),
+        self.assertEqual(os.path.join(WORKING_DIRECTORY, "output", "data.dat"),
                          plugin.ports["output"])
 
     def test_missing_input_file(self):
-        executor = WorkflowExecutor()
+        executor = LocalhostExecutor()
         executor.set_plugin_storage(self.plugin_source)
         with self.assertRaises(Exception):
             executor.execute(TEST_DIRECTORY + "connected_plugins.json",
@@ -64,9 +71,9 @@ class TestWorkflowExecutor(unittest.TestCase):
                              [])
 
     def test_connected_plugins_with_input_and_working_file(self):
-        executor = WorkflowExecutor()
-        input_directory = os.path.dirname(
-            os.path.abspath(__file__)) + "/../../" + TEST_DIRECTORY
+        executor = LocalhostExecutor()
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        input_directory = this_dir + "/../../" + TEST_DIRECTORY
         executor.set_plugin_storage(self.plugin_source)
         executor.execute(TEST_DIRECTORY + "connected_plugins.json",
                          WORKING_DIRECTORY,
@@ -80,7 +87,10 @@ class TestWorkflowExecutor(unittest.TestCase):
 
         self.assertEqual(plugin.ports["output"], plugin_2.ports["input"])
 
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(WORKING_DIRECTORY)
+
 
 if __name__ == '__main__':
     unittest.main()
-    os.removedirs(WORKING_DIRECTORY)

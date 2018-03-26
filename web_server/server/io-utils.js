@@ -66,7 +66,7 @@ function fileToJson(path) {
 
 function deleteDirectory(path) {
     return new Promise((fulfill, reject) => {
-        const options = {"disableGlob" : true};
+        const options = {"disableGlob": true};
         rimraf(path, options, (error) => {
             if (error) {
                 reject(error);

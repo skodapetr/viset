@@ -7,14 +7,14 @@ export function createEmptyFilterItem() {
 }
 
 export function filterList(filters, data) {
-    console.time("filter-api.filterList");
+    // console.time("filter-api.filterList");
     if (data === undefined) {
         return undefined;
     }
     const dataIndexes = Object.keys(data);
     const filteredIndexes = getMatchingIndexes(filters, dataIndexes, data);
     const result =  collectObjectWithIndexes(data, filteredIndexes);
-    console.timeEnd("filter-api.filterList");
+    // console.timeEnd("filter-api.filterList");
     return result;
 }
 
@@ -66,10 +66,10 @@ function collectObjectWithIndexes(data, keys) {
 }
 
 export function filterMultipleLists(filters, lists) {
-    console.time("filter-api.filterMultipleLists");
+    // console.time("filter-api.filterMultipleLists");
     const sharedKeys = getUnionOfMatchingKeys(filters, lists);
     const result =  collectObjectWithKeysFromLists(lists, sharedKeys);
-    console.timeEnd("filter-api.filterMultipleLists");
+    // console.timeEnd("filter-api.filterMultipleLists");
     return result;
 }
 

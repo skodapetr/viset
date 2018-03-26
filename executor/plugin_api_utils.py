@@ -2,10 +2,16 @@
 # -*- coding: utf-8 -*-
 """
 This module is part of plugin API.
+
+Do not use module method directly!
 """
+
+import gzip
 
 __license__ = "X11"
 
+
+# TODO Add option to NOT-ignore invalid molecules
 
 class RdkitUtils(object):
     """
@@ -17,7 +23,7 @@ class RdkitUtils(object):
         """
         Load molecules from given file.
 
-        :param path:
+        :param path: Can be a list.
         :param sanitize:
         :param ignore_invalid_files:
         :return: Array of RDKit molecules.
@@ -26,48 +32,71 @@ class RdkitUtils(object):
             path = [path]
         molecules = []
         for item in path:
-            loaded_molecules = RdkitUtils._load_molecules_file(
+            loaded_molecules = _load_molecules_file(
                 item, sanitize, ignore_invalid_files)
             molecules.extend(loaded_molecules)
         return molecules
 
-    @staticmethod
-    def _load_molecules_file(path, sanitize, ignore_invalid_files):
-        if path.endswith(".sdf"):
-            return RdkitUtils._load_molecules_sdf(path, sanitize)
-        elif path.endswith(".sdf.gz"):
-            return RdkitUtils._load_molecules_sdf_gz(path, sanitize)
-        elif path.endswith(".smi"):
-            return RdkitUtils._load_molecules_smi(path, sanitize)
-        else:
-            if not ignore_invalid_files:
-                raise Exception("Invalid file: " + path)
-            else:
-                return []
 
-    @staticmethod
-    def _load_molecules_sdf(path, sanitize):
-        from rdkit import Chem
-        #
-        return [mol for mol in Chem.SDMolSupplier(path, sanitize=sanitize)
+def _load_molecules_file(path, sanitize, ignore_invalid_files):
+    if path.endswith(".sdf"):
+        return _load_molecules_sdf(path, sanitize)
+    elif path.endswith(".sdf.gz"):
+        return _load_molecules_sdf_gz(path, sanitize)
+    elif path.endswith(".smi"):
+        return _load_molecules_smi(path, sanitize)
+    elif path.endswith(".smi.gz"):
+        return _load_molecules_smi_gz(path, sanitize)
+    else:
+        if not ignore_invalid_files:
+            raise Exception("Invalid file: " + path)
+        else:
+            return []
+
+
+def _load_molecules_sdf(path, sanitize):
+    from rdkit import Chem
+    #
+    return [mol for mol in Chem.SDMolSupplier(path, sanitize=sanitize)
+            if mol is not None]
+
+
+def _load_molecules_sdf_gz(path, sanitize):
+    from rdkit import Chem
+    #
+    with gzip.open(path, "rb") as stream:
+        return [mol for mol in
+                Chem.ForwardSDMolSupplier(stream, sanitize=sanitize)
                 if mol is not None]
 
-    @staticmethod
-    def _load_molecules_sdf_gz(path, sanitize):
-        from rdkit import Chem
-        import gzip
-        #
-        with gzip.open(path, "rb") as stream:
-            return [mol for mol in
-                    Chem.ForwardSDMolSupplier(stream, sanitize=sanitize)
-                    if mol is not None]
 
-    @staticmethod
-    def _load_molecules_smi(path, sanitize):
-        from rdkit.Chem import AllChem
-        #
-        molecules = []
-        with open(path) as stream:
-            for line in stream:
-                molecules.append(AllChem.MolFromSmiles(line, sanitize=sanitize))
-        return molecules
+def _load_molecules_smi(path, sanitize):
+    with open(path) as stream:
+        return _parse_smi_stream(stream, sanitize)
+
+
+def _parse_smi_stream(stream, sanitize):
+    from rdkit.Chem import AllChem
+    #
+    molecules = []
+    for line in stream:
+        smiles, name = _parse_smiles_file_line(line)
+        molecule = AllChem.MolFromSmiles(smiles, sanitize=sanitize)
+        if molecule is None:
+            continue
+        molecule.SetProp("_Name", name)
+        molecules.append(molecule)
+    return molecules
+
+
+def _parse_smiles_file_line(line):
+    line = line.strip().split("\t")
+    if len(line) == 1:
+        return line[0], line[0]
+    else:
+        return line[0], line[1]
+
+
+def _load_molecules_smi_gz(path, sanitize):
+    with gzip.open(path, "rb") as stream:
+        return _parse_smi_stream(stream, sanitize)

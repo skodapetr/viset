@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "id": "test-method",
+    "label": ""
+  },
+  "user_interface": {
+    "input": {},
+    "output": {}
+  },
+  "workflow": [
+    {
+      "id": "write-to-file",
+      "configuration": {
+        "text": "file content"
+      },
+      "ports": {
+        "output": {
+          "file": "data.json",
+          "dir": "working"
+        }
+      }
+    },
+    {
+      "id": "copy-file",
+      "configuration": {},
+      "ports": {
+        "input": {
+          "file": "data.json",
+          "dir": "working"
+        },
+        "output": {
+          "file": "scores.json",
+          "dir": "output"
+        }
+      }
+    }
+  ]
+}

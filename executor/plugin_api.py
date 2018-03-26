@@ -32,14 +32,14 @@ class PluginInterface(object):
 
     @abc.abstractmethod
     def get_metadata(self) -> object:
-        raise NotImplementedError("Please implement this method.")
+        """Return plugin's metadata."""
 
     def configure(self, configuration: object):
         self.configuration = configuration
 
     @abc.abstractmethod
     def execute(self, files: typing.Dict[str, str]):
-        raise NotImplementedError("Please implement this method.")
+        """Execute given plugin with given files."""
 
 
 class PluginSourceInterface(object):
@@ -47,12 +47,8 @@ class PluginSourceInterface(object):
 
     @abc.abstractmethod
     def get_plugin(self, plugin):
-        raise NotImplementedError("Please implement this method.")
+        """Get plugin of given name."""
 
     @abc.abstractmethod
     def get_metadata(self):
-        raise NotImplementedError("Please implement this method.")
-
-
-if __name__ == "__main__":
-    raise Exception("This module should not be executed.")
+        """Return metadata records for every plugin."""

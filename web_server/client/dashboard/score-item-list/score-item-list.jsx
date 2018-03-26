@@ -84,7 +84,6 @@ const Table = ({data, selection, onRowClick}) => (
     </table>
 );
 
-const PAGE_SIZE = 20;
 
 class ScoreItemListTileComponent extends React.Component {
 

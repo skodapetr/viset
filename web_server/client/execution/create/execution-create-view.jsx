@@ -1,6 +1,5 @@
 import React from "react";
 import {connect} from "react-redux";
-import {fetchMethods} from "./../../method/method-action";
 import {
     methodListSelector,
     methodDetailSelector
@@ -13,20 +12,21 @@ import {
     destroy
 } from "./execution-create-action";
 import {push} from "react-router-redux";
-import {isLoadingSelector, dataSelector} from "./../../service/repository";
-import {SelectMethods} from "./select-methods";
-import {SelectFiles} from "./select-files";
+import {WizardGeneral} from "./wizard-general";
+import {WizardFiles} from "./wizard-files";
 import {Container} from "reactstrap";
-import {SelectMetadata} from "./select-metadata";
+import {WizardMethods} from "./wizard-methods";
+import {WizardBenchmark} from "./wizard-benchmark";
 
 class ExecutionCreateContainer extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = this.getInitialState();
-        this.onSetMetadata = this.onSetMetadata.bind(this);
-        this.onMethodsSelected = this.onMethodsSelected.bind(this);
-        this.onFilesSelected = this.onFilesSelected.bind(this);
+        this.onSetGeneral = this.onSetGeneral.bind(this);
+        this.onSetMethods = this.onSetMethods.bind(this);
+        this.onSetFiles = this.onSetFiles.bind(this);
+        this.onSetBenchmark = this.onSetBenchmark.bind(this);
         this.createExecution = this.createExecution.bind(this);
         this.selectActiveComponent = this.selectActiveComponent.bind(this);
     }
@@ -53,24 +53,22 @@ class ExecutionCreateContainer extends React.Component {
         switch (this.state.step) {
             case 0:
                 return (
-                    <SelectMetadata onSetMetadata={this.onSetMetadata}/>
+                    <WizardGeneral onSubmit={this.onSetGeneral}/>
                 );
             case 1:
                 return (
-                    <SelectMethods
-                        isLoading={isLoadingSelector(this.props.methodsList)}
-                        methods={dataSelector(this.props.methodsList)}
-                        selected={this.props.selected}
-                        onToggleSelection={this.props.toggleMethodSelection}
-                        onSelect={this.onMethodsSelected}
-                    />
+                    <WizardMethods onSubmit={this.onSetMethods}/>
                 );
             case 2:
                 return (
-                    <SelectFiles
-                        methods={this.props.methods}
-                        onFilesSelected={this.onFilesSelected}
-                    />
+                    <WizardBenchmark onSubmit={this.onSetBenchmark}/>
+                );
+            case 3:
+                // TODO Pass also "type".
+                return (
+                    <WizardFiles onSubmit={this.onSetFiles}
+                                 methodsId={this.state.selectedMethods}
+                                 executionType={this.state.type}/>
                 );
             default:
                 return (
@@ -81,43 +79,65 @@ class ExecutionCreateContainer extends React.Component {
         }
     }
 
-    onSetMetadata(execution) {
+    onSetGeneral(data) {
         this.setState({
             "step": 1,
-            "execution": execution
+            "label": data["label"],
+            "description": data["description"],
+            "type": data["type"]
         });
     }
 
-    onMethodsSelected() {
-        this.props.fetchSelected(Object.keys(this.props.selected));
+    onSetMethods(methods) {
+        const selectedMethods = [];
+        for (let key in methods) {
+            if (methods[key]) {
+                selectedMethods.push(key);
+            }
+        }
+        let nextStep = this.state.type === "benchmark" ? 2 : 3;
         this.setState({
-            "step": 2
+            "step": nextStep,
+            "selectedMethods": selectedMethods
         });
     }
 
-    onFilesSelected(files) {
-        this.createExecution(files);
+    onSetBenchmark(data) {
+        this.setState({
+            "step": 3,
+            "benchmark": data
+        });
     }
 
-    createExecution(files) {
+    onSetFiles(files) {
+        const data = {
+            "execution": {
+                "type": this.state.type,
+                "label": this.state.label,
+                "description": this.state.description,
+                "benchmark": this.state.benchmark
+            },
+            "methods": this.state.selectedMethods,
+            "files": files
+        };
+        this.createExecution(data);
+    }
+
+    createExecution(data) {
         const formData = new FormData();
-
-        const usedMethodsIds = Object.keys(this.props.selected);
-        formData.append("methods", JSON.stringify(usedMethodsIds));
-        formData.append("execution", JSON.stringify(this.state.execution));
-
-        for (let key in files) {
-            const item = files[key];
+        formData.append("methods", JSON.stringify(data.methods));
+        formData.append("execution", JSON.stringify(data.execution));
+        for (let key in data.files) {
+            const item = data.files[key];
             formData.append("input", item.file, item.fileName);
         }
-
+        console.log("FROM", formData);
         // TODO Add sending wait-dialog.
-
+        // TODO Use better implementation, ie. move to API - action ?
         fetch("/api/v1/resources/executions", {
             "method": "POST",
             "body": formData
         }).then(() => {
-            // TODO Use better implementation, ie. move to API - action ?
             this.props.navigateToExecutionList();
         });
     }
@@ -138,7 +158,6 @@ export const ExecutionCreate = connect(
     (dispatch, ownProps) => ({
         "initialize": () => {
             dispatch(initialize());
-            dispatch(fetchMethods());
         },
         "destroy": () => {
             dispatch(destroy());

@@ -3,6 +3,7 @@ import {PropTypes} from "prop-types";
 import {Nav, NavItem, NavLink, TabContent} from "reactstrap";
 import classnames from "classnames";
 
+// TODO Update mouse icon on the navigation items.
 const TabHeaderItem = ({component, onClick, isActiveTab}) => (
     <NavItem onClick={component.props.enabled ? onClick : undefined}>
         <NavLink

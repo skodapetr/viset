@@ -3,10 +3,13 @@
     {
       "id": "do-nothing",
       "configuration": {
-        "value" : 2
+        "value": 2
       },
       "ports": {
-        "output": "output.dat"
+        "output": {
+          "file": "data.dat",
+          "dir": "output"
+        }
       }
     }
   ]

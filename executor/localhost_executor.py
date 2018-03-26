@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Python Simple Workflow executor
+Executor for pipeline execution on local instance.
 """
 
 import json
@@ -14,31 +14,43 @@ from plugin_api import PluginSourceInterface
 __license__ = "X11"
 
 
-class WorkflowExecutor(object):
+class LocalhostExecutor(object):
     """
     Pipeline executor.
+
+    Input paths must be relative to the working directory!
     """
 
     def __init__(self):
         self.directory = None
         self.input_directories = None
         self.plugin_source = None
+        self.port_mapping = {}
 
     def set_plugin_storage(self, plugin_source: PluginSourceInterface):
         self.plugin_source = plugin_source
 
-    def execute(self, definition_file: str, working_directory: str,
-                input_directories: typing.List[str]):
-        self._initialize_directories(working_directory, input_directories)
+    def set_port_mapping(self, port_mapping):
+        """
+        Port mapping can be used to mart port by types.
+        """
+        self.port_mapping = port_mapping
+
+    def execute(
+            self,
+            definition_file: str,
+            working_dir: str,
+            input_dir: typing.List[str]):
+        self._initialize_directories(working_dir, input_dir)
         self._load_pipeline(definition_file)
         self._create_directories()
         self._execute_components()
         # TODO Perform cleanup
 
-    def _initialize_directories(self, working_directory, input_directories):
-        self.directory = os.path.abspath(working_directory)
+    def _initialize_directories(self, working_dir, input_dir):
+        self.directory = os.path.abspath(working_dir)
         self.input_directories = [self._expand_relative_path(directory)
-                                  for directory in input_directories]
+                                  for directory in input_dir]
 
     def _expand_relative_path(self, path):
         return os.path.join(self.directory, path)
@@ -51,9 +63,6 @@ class WorkflowExecutor(object):
     def _create_directories(self):
         os.makedirs(self._get_working_path(), exist_ok=True)
         os.makedirs(self._get_output_path(), exist_ok=True)
-
-    def _get_input_path(self):
-        return os.path.join(self.directory, "input")
 
     def _get_working_path(self):
         return os.path.join(self.directory, "working")
@@ -92,21 +101,25 @@ class WorkflowExecutor(object):
     def _prepare_ports(self, ports):
         output = {}
         for port_id in ports.keys():
-            port_value = ports[port_id]
-            if port_value.startswith("input"):
-                output[port_id] = self._resolve_port_path(port_value)
+            port = ports[port_id]
+            port = self._check_port_mapping(port)
+            file_name = port["file"]
+            if port["dir"] == "input":
+                output[port_id] = self._resolve_port_path(file_name)
             else:
-                output[port_id] = self._expand_relative_path(port_value)
+                path = os.path.join(port["dir"], file_name)
+                output[port_id] = self._expand_relative_path(path)
         return output
 
+    def _check_port_mapping(self, port):
+        if "type" in port and port["type"] in self.port_mapping:
+                return self.port_mapping[port["type"]]
+        return port
+
     def _resolve_port_path(self, path):
-        relative_path = path[path.index("/") + 1:]
         for directory in self.input_directories:
-            candidate_path = os.path.join(directory, relative_path)
+            candidate_path = os.path.join(directory, path)
             if os.path.isfile(candidate_path):
                 return candidate_path
+        logging.info("Input directories: %s", str(self.input_directories))
         raise Exception("Missing input file: " + path)
-
-
-if __name__ == "__main__":
-    raise Exception("This module should not be executed.")

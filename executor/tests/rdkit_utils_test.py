@@ -25,6 +25,16 @@ class TestMoleculeLoading(unittest.TestCase):
             TEST_DIRECTORY + "/two_molecules.smi")
         self.assertEqual(2, len(molecules))
 
+    def test_invalid_file(self):
+        self.assertRaises(Exception, RdkitUtils.load_molecules,
+                          TEST_DIRECTORY + "/missing_file")
+
+    def test_invalid_file_with_ignore_invalid_option(self):
+        molecules = RdkitUtils.load_molecules(
+            TEST_DIRECTORY + "/missing_file",
+            ignore_invalid_files=True)
+        self.assertEqual(0, len(molecules))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,17 +1,17 @@
 import React from "react";
 import {connect} from "react-redux";
-import {fetchMethod, clearMethodsDetail} from "./../method-action";
+import {fetchMethod} from "./../method-action";
 import {isLoadingSelector, dataSelector} from "./../../service/repository";
 import {methodDetailSelector} from "./../method-reducer";
 import {addLoadingIndicator} from "./../../components/loading-indicator";
 import {Container} from "reactstrap";
 
 const MethodDetailComponent = addLoadingIndicator(({data}) => (
-    <div>
+    <Container>
         <p><b>ID:</b> {data.metadata.id}</p>
         <p><b>Label:</b> {data.metadata.label}</p>
         <p><b>Description:</b> {data.metadata.description}</p>
-    </div>
+    </Container>
 ));
 
 class MethodDetailContainer extends React.Component {
@@ -23,12 +23,9 @@ class MethodDetailContainer extends React.Component {
     render() {
         const data = this.props.data;
         return (
-            <Container>
-                <MethodDetailComponent
-                    isLoading={isLoadingSelector(data)}
-                    data={dataSelector(data)}
-                />
-            </Container>
+            <MethodDetailComponent
+                isLoading={isLoadingSelector(data)}
+                data={dataSelector(data)}/>
         )
     }
 

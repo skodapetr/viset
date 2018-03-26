@@ -1,7 +1,13 @@
 "use strict";
 
 const fs = require("fs");
-const io = require("./io-utils");
+const io = require("./../io-utils");
+
+module.exports = {
+    "initialize": initialize,
+    "list": () => publicList,
+    "detail": getMethod
+};
 
 class IndexRecord {
     constructor(method) {
@@ -10,13 +16,13 @@ class IndexRecord {
     }
 }
 
-const index = buildIndex();
-const publicList = createPublicList(index);
+let index;
+let publicList;
 
-module.exports = {
-    "list": () => publicList,
-    "get": getMethod
-};
+function initialize() {
+    index = buildIndex();
+    publicList = createPublicList(index);
+}
 
 function buildIndex() {
     const index = {};

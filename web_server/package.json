@@ -8,7 +8,9 @@
   },
   "main": "server.js",
   "author": "",
-  "scripts": {},
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec \"./{,!(node_modules)/**/}*.test.js\""
+  },
   "license": "X11",
   "dependencies": {
     "babel-plugin-recharts": "^1.1.0",
@@ -36,13 +38,15 @@
     "redux-thunk": "^2.2.0",
     "reselect": "^3.0.1",
     "rimraf": "^2.6.2",
-    "thunk": "0.0.1"
-  },
-  "devDependencies": {
+    "thunk": "0.0.1",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.24.0",
     "babel-loader": "^6.4.1",
     "webpack": "^2.3.3",
     "webpack-dev-middleware": "^1.10.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.0.0"
   }
 }

@@ -3,19 +3,17 @@ import {connect} from "react-redux";
 import {fetchExecution, clearExecution} from "./../execution-action";
 import {executionDetailSelector} from "./../execution-reducer";
 import {LoadingIndicator} from "./../../components/loading-indicator";
-import {ExecutionDetailDashboard} from "./../../dashboard/execution-detail";
-import {ScoreItemListDashboard} from "./../../dashboard/score-item-list/score-item-list";
 import {isLoadingSelector, dataSelector} from "./../../service/repository";
-import {isExecutionFinished, deleteExecution} from "./../execution-api";
+import {isExecutionFinished} from "./../execution-api";
 import {Tabs} from "./../../components/tab";
-import {ScoreItemDetailDashboard} from "./../../dashboard/score-item-detail";
 import {toggleSelection, clearSelection} from "./execution-detail-action";
 import {sharedSelectionSelector} from "./execution-detail-reducer";
-import {clearOutputs} from "./../../output/output-action";
 import {destroyFilter} from "./../../components/filter/filter-action";
 import {destroyMethods} from "./../../dashboard/score-item-list/score-item-list-action";
-import {SimilarityHistogramDashboard} from "./../../dashboard/similarity-histogram";
-import {push} from "react-router-redux";
+import {BenchmarkTab} from "./../../execution-detail/benchmark/benchmark-tab";
+import {GeneralTab} from "./../../execution-detail/general/general-tab";
+import {ManagementTab} from "./../../execution-detail/management/management-tab";
+import {ScoreTab} from "./../../execution-detail/score/score-tab";
 
 class ExecutionDetail extends React.Component {
 
@@ -40,31 +38,42 @@ class ExecutionDetail extends React.Component {
         const isFinished = isExecutionFinished(execution);
         return (
             <Tabs>
-                <ExecutionDetailDashboard
-                    execution={execution}
-                    label={"Details"}
-                    enabled={true}
-                    onDelete={this.props.onDelete}/>
-                <ScoreItemListDashboard
-                    execution={execution}
-                    label={"Results list"}
-                    enabled={isFinished}
-                    selection={this.props.selection}
-                    onToggleSelection={this.props.toggleSelection}/>
-                <ScoreItemDetailDashboard
-                    execution={execution}
-                    label={"Selection detail"}
-                    enabled={isFinished}
-                    selection={this.props.selection}
-                    onToggleSelection={this.props.toggleSelection}/>
-                <SimilarityHistogramDashboard
-                    execution={execution}
-                    label={"Similarity histogram"}
-                    enabled={isFinished}
-                    selection={this.props.selection}
-                    onToggleSelection={this.props.toggleSelection}/>
+                <GeneralTab execution={execution}
+                            label={"Overview"}
+                            enabled={true}/>
+                <ManagementTab execution={execution}
+                               label={"Management"}
+                               enabled={isFinished}/>
+                <ScoreTab execution={execution}
+                          label={"Results"}
+                          enabled={isFinished}/>
+                <BenchmarkTab execution={execution}
+                              label={"Benchmark"}
+                              enabled={isFinished}/>
+
             </Tabs>
         );
+
+        // return (
+        //         <ScoreItemListDashboard
+        //             execution={execution}
+        //             label={"Results list"}
+        //             enabled={isFinished}
+        //             selection={this.props.selection}
+        //             onToggleSelection={this.props.toggleSelection}/>
+        //         <ScoreItemDetailDashboard
+        //             execution={execution}
+        //             label={"Selection detail"}
+        //             enabled={isFinished}
+        //             selection={this.props.selection}
+        //             onToggleSelection={this.props.toggleSelection}/>
+        //         <SimilarityHistogramDashboard
+        //             execution={execution}
+        //             label={"Similarity histogram"}
+        //             enabled={isFinished}
+        //             selection={this.props.selection}
+        //             onToggleSelection={this.props.toggleSelection}/>
+        // )
     }
 
     componentWillUnmount() {
@@ -83,17 +92,14 @@ export const ExecutionDetailView = connect(
             dispatch(fetchExecution(id));
         },
         "destroy": (id) => {
+            // TODO Properly clearup
             dispatch(clearExecution(id));
-            dispatch(clearOutputs());
+            // dispatch(clearOutputs());
             dispatch(destroyFilter("base-dashboard"));
             dispatch(destroyMethods());
             dispatch(clearSelection());
         },
         "toggleSelection": (item) => dispatch(toggleSelection(item)),
-        "onDelete": () => {
-            deleteExecution(ownProps.params.id).then(() => {
-                dispatch(push("/execution"));
-            });
-        }
+
     }))
 (ExecutionDetail);
