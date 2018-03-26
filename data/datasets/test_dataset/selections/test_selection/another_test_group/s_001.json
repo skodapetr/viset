@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "instance": "001"
+  },
+  "data": {
+    "test": [
+      {
+        "name": "DEC0"
+      },
+      {
+        "name": "DEC1"
+      },
+      {
+        "name": "DEC2"
+      },
+      {
+        "name": "A0"
+      }
+    ],
+    "train": {
+      "decoys": [
+        {
+          "name": "DEC3"
+        }
+      ],
+      "ligands": [
+        {
+          "name": "A1"
+        },{
+          "name": "A2"
+        }
+      ]
+    },
+    "files": [
+      "molecules"
+    ]
+  }
+}

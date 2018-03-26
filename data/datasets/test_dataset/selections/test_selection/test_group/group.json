@@ -1,0 +1,29 @@
+{
+  "data": {
+    "decoys": [
+      {
+        "name": "DEC0"
+      },
+      {
+        "name": "DEC1"
+      },
+      {
+        "name": "DEC2"
+      },
+      {
+        "name": "DEC3"
+      }
+    ],
+    "ligands": [
+      {
+        "name": "A0"
+      },
+      {
+        "name": "A1"
+      },
+      {
+        "name": "A2"
+      }
+    ]
+  }
+}
