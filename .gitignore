@@ -1,6 +1,3 @@
-# Project files:
-.idea/
-
 # Byte-compiled / optimized / DLL files:
 __pycache__/
 *.py[cod]
@@ -10,7 +7,11 @@ __pycache__/
 data/executions
 data/collections
 data/datasets
+data/cache
 data/temp
 
 # NodeJs modules:
 node_modules/
+
+# Hidden files:
+.*
