@@ -8,10 +8,12 @@
   "user_interface": {
     "input": {
       "actives.sdf": {
-        "label": "Active molecules"
+        "label": "Active molecules",
+        "hideForBenchmark": true
       },
       "database.sdf": {
-        "label": "Library to screen"
+        "label": "Library to screen",
+        "hideForBenchmark": true
       }
     },
     "output": {
@@ -25,33 +27,63 @@
       "id": "rdkit/atom-pairs",
       "type": "representation",
       "ports": {
-        "database_file": "input/actives.sdf",
-        "output_file": "working/actives.json"
+        "database_file": {
+          "file": "actives.sdf",
+          "dir": "input",
+          "type": "train-actives"
+        },
+        "output_file": {
+          "file": "actives.json",
+          "dir": "working"
+        }
       }
     },
     {
       "id": "rdkit/atom-pairs",
       "type": "representation",
       "ports": {
-        "database_file": "input/database.sdf",
-        "output_file": "working/database.json"
+        "database_file": {
+          "file": "database.sdf",
+          "dir": "input",
+          "type": "test"
+        },
+        "output_file": {
+          "file": "database.json",
+          "dir": "working"
+        }
       }
     },
     {
       "id": "rdkit/tanimoto",
       "type": "similarity",
       "ports": {
-        "query_file": "working/actives.json",
-        "database_file": "working/database.json",
-        "output_file": "working/similarity.json"
+        "query_file": {
+          "file": "actives.json",
+          "dir": "working"
+        },
+        "database_file": {
+          "file": "database.json",
+          "dir": "working"
+        },
+        "output_file": {
+          "file": "similarity.json",
+          "dir": "working"
+        }
       }
     },
     {
       "id": "max-fusion",
       "type": "fusion",
       "ports": {
-        "database_file": "working/similarity.json",
-        "output_file": "output/scores.json"
+        "database_file": {
+          "file": "similarity.json",
+          "dir": "working"
+        },
+        "output_file": {
+          "file": "scores.json",
+          "type": "scores",
+          "dir": "output"
+        }
       }
     }
   ]
