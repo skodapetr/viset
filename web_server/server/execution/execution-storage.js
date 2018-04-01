@@ -42,7 +42,7 @@ function buildIndex() {
     const index = {};
     const executionDirectory = getExecutionsDirectory();
     if (!fs.existsSync(executionDirectory)) {
-        fs.mkdir(executionDirectory);
+        fs.mkdirSync(executionDirectory);
     }
     fs.readdirSync(executionDirectory).forEach(file => {
         const path = executionDirectory + file;
