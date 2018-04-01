@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "id": "01",
+    "label": "01",
+    "description": "Collection used by the MFF UK to test Bayescreen"
+  },
+  "data": {
+    "0.80-0.85": [
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "5HT2B_Antagonist"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "5HT2C_Antagonist"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "ADA2A_Antagonist"
+      },
+      {
+        "dataset": "10.1021%2Fci2005274",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "CDK2"
+      },
+      {
+        "dataset": "10.1021%2Fci5005515",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "HDAC01"
+      },
+      {
+        "dataset": "10.1021%2Fjm500132p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "PXR_Agonist"
+      }
+    ],
+    "0.85-0.90": [
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "ACM1_Agonist"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "ADA2B_Antagonist"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "ADA2C_Antagonist"
+      },
+      {
+        "dataset": "10.1021%2Fci2005274",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "CHK1"
+      }
+    ],
+    "0.90-0.95": [
+      {
+        "dataset": "10.1016%2Fj.ymeth.2014.11.015",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "5HT1F_Agonist"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "DRD1_Antagonist"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "DRD2_Agonist"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "LSHR_Antagonist"
+      },
+      {
+        "dataset": "10.1016%2Fj.ymeth.2014.11.015",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "OPRM_Agonist"
+      }
+    ],
+    "0.95-1.00": [
+      {
+        "dataset": "10.1021%2Fjm300687e",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "DHFR"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "MTR1A_Agonist"
+      },
+      {
+        "dataset": "10.1016%2Fj.ymeth.2014.11.015",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "MTR1B_Agonist"
+      },
+      {
+        "dataset": "10.1021%2Fjm300687e",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "P38"
+      },
+      {
+        "dataset": "10.1021%2Fci200412p",
+        "selection": "random_02_30_100_20_4900_M",
+        "group": "V2R_Antagonist"
+      }
+    ]
+  }
+}
