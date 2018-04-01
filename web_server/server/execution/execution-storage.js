@@ -41,7 +41,9 @@ function initialize() {
 function buildIndex() {
     const index = {};
     const executionDirectory = getExecutionsDirectory();
-    io.mkdirAsynch(executionDirectory);
+    if (!fs.existsSync(executionDirectory)) {
+        fs.mkdir(executionDirectory);
+    }
     fs.readdirSync(executionDirectory).forEach(file => {
         const path = executionDirectory + file;
         try {
