@@ -79,7 +79,7 @@ def prepare(split_files, molecule_dir, output_dir):
             logging.debug("Waiting for others to prepare data  ...")
             while _is_being_prepared(split_output_dir):
                 time.sleep(3)
-                logging.debug("Waiting for others to prepare data  ... done")
+            logging.debug("Waiting for others to prepare data  ... done")
     logging.info("Preparing benchmarking data ... done")
     return output_molecule_dirs
 
