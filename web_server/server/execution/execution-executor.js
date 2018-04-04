@@ -7,27 +7,27 @@ module.exports = {
     "setPluginsPath": setPluginsPath
 };
 
-let pluginsPath = "./../plugins";
+let pluginsPath = "./plugins";
 let executor = undefined;
 
 function connect(newExecutor) {
     executor = newExecutor;
 }
 
-function startExecution(executionDirectory) {
-    const command = "python executor.py" +
+function startExecution(id, executionDirectory) {
+    const command = "python ./executor/executor.py" +
         " --plugins " + pluginsPath +
         " --workflow " + executionDirectory + "/workflow.json" +
         " --input " + executionDirectory + "/../../input" +
         " --directory " + executionDirectory +
         " > " + executionDirectory + "/stdout.log" +
         " 2> " + executionDirectory + "/stderr.log";
-    const name = "execution-" + executionDirectory;
+    const name = "execution-" + id;
     return executor.start(name, command);
 }
 
-function startBenchmarkExecution(executionDirectory) {
-    const command = "python executor.py" +
+function startBenchmarkExecution(id, executionDirectory) {
+    const command = "python ./executor/executor.py" +
         " --plugins " + pluginsPath +
         " --workflow " + executionDirectory + "/workflow.json" +
         " --input " + executionDirectory + "/../../input" +
@@ -35,7 +35,7 @@ function startBenchmarkExecution(executionDirectory) {
         " --benchmark " + executionDirectory + "/../../benchmark.json" +
         " > " + executionDirectory + "/stdout.log" +
         " 2> " + executionDirectory + "/stderr.log";
-    const name = "execution-benchmark-" + executionDirectory;
+    const name = "execution-benchmark-" + id;
     return executor.start(name, command);
 }
 

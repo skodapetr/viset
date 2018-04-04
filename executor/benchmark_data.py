@@ -114,6 +114,7 @@ def _lock_dir_path(split_dir):
 
 
 def _lock_split(split_dir):
+    os.makedirs(split_dir, exist_ok=True)
     try:
         os.makedirs(_lock_dir_path(split_dir))
         return True

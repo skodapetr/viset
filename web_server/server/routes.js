@@ -177,9 +177,9 @@ function parserRequestToExecution(req, execution) {
             const options = JSON.parse(optionsString);
             const methodsDetail = methodsId.map(id => methods.detail(id));
             executions.initialize(execution, methodsDetail, options)
-            .then((record) => {
-                executions.onNewExecution(record);
-                fulfill(record);
+            .then((executionRecord) => {
+                executions.onNewExecution(executionRecord);
+                fulfill(executionRecord);
             })
             .catch(reject);
         });

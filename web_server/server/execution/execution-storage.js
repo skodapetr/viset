@@ -96,11 +96,11 @@ function createPublicIndexRecord(execution) {
 }
 
 function getExecutionData(id) {
-    const method = index[id];
-    if (method === undefined) {
+    const execution = index[id];
+    if (execution === undefined) {
         return undefined;
     }
-    return method["data"];
+    return execution["data"];
 }
 
 function deleteExecution(id) {

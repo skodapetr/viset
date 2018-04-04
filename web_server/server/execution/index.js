@@ -28,6 +28,6 @@ module.exports = {
     "getRunOutputPath":storage.getRunOutputPath,
     //
     "initialize": factory.initialize,
-    "create": factory.create()
+    "create": factory.create
 };
 

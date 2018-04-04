@@ -83,6 +83,12 @@ function updateDownloadStatus(dataset) {
     });
 }
 
+function updateSelectionGroups(dataset) {
+    dataset["selections"].forEach((selection) => {
+        selection["groups"] = listGroups(dataset, selection);
+    });
+}
+
 function buildDatasetIndex(datasets) {
     return Object.values(datasets).map(
         dataset => createDatasetIndexRecord(dataset));
@@ -148,5 +154,6 @@ function onFinishDownload(datasetId) {
     const dataset = datasetsDetails[datasetId];
     dataset["downloading"] = false;
     updateDownloadStatus(dataset);
+    updateSelectionGroups(dataset);
     updateIndexRecord(dataset);
 }

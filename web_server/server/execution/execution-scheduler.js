@@ -17,7 +17,6 @@ let executor = undefined;
 function connect(newExecutor, newStorage) {
     executor = newExecutor;
     executionStorage = newStorage;
-    executor.setPluginsPath("../plugins");
 }
 
 function start() {
@@ -70,14 +69,14 @@ function startExecution(execution, method) {
     runningTasks.push(id);
     const directory = executionDirectory(execution, method);
     if (execution.type === "benchmark") {
-        return executor.startBenchmarkExecution(directory);
+        return executor.startBenchmarkExecution(id, directory);
     } else {
-        return executor.startExecution(directory);
+        return executor.startExecution(id, directory);
     }
 }
 
 function executionDirectory(execution, method) {
-    return "../data/executions/" + execution.id + "/methods/" + method.id;
+    return "./data/executions/" + execution.id + "/methods/" + method.id;
 }
 
 function onExecutionFinished(execution, method) {

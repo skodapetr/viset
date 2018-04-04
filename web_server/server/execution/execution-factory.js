@@ -65,8 +65,10 @@ function initializeExecution(reference, methods, options) {
         usedMethods[method["metadata"]["id"]] = createMethodObject(method);
         return prev.then(() => initMethodDirectory(methodsPath, method));
     }, startingValue).then(() => {
-        const indexRecord = createExecutionRecord(
+        const frontendFile = createFrontendFileContent(
             reference, usedMethods, options);
+        const indexRecord = createExecutionRecord(
+            reference, frontendFile);
         return writeFrontendFile(indexRecord)
         .then(() => Promise.resolve(indexRecord));
     });
@@ -95,13 +97,6 @@ function initMethodDirectory(directory, method) {
     .then(() => io.jsonToFile(method, methodDir + "/workflow.json"));
 }
 
-function createExecutionRecord(reference, methods, options) {
-    return {
-        "id": reference["id"],
-        "path": reference["path"]
-    };
-}
-
 function createFrontendFileContent(reference, methods, options) {
     return {
         "id": reference["id"],
@@ -109,6 +104,14 @@ function createFrontendFileContent(reference, methods, options) {
         "description": options["description"],
         "type": options["type"],
         "methods": methods
+    };
+}
+
+function createExecutionRecord(reference, frontendFile) {
+    return {
+        "id": reference["id"],
+        "path": reference["path"],
+        "data": frontendFile
     };
 }
 
