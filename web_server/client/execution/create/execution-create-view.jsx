@@ -17,6 +17,7 @@ import {WizardFiles} from "./wizard-files";
 import {Container} from "reactstrap";
 import {WizardMethods} from "./wizard-methods";
 import {WizardBenchmark} from "./wizard-benchmark";
+import {LoadingIndicator} from "./../../components/loading-indicator";
 
 class ExecutionCreateContainer extends React.Component {
 
@@ -64,11 +65,14 @@ class ExecutionCreateContainer extends React.Component {
                     <WizardBenchmark onSubmit={this.onSetBenchmark}/>
                 );
             case 3:
-                // TODO Pass also "type".
                 return (
                     <WizardFiles onSubmit={this.onSetFiles}
                                  methodsId={this.state.selectedMethods}
                                  executionType={this.state.type}/>
+                );
+            case 4:
+                return (
+                    <LoadingIndicator message="Creating execution..."/>
                 );
             default:
                 return (
@@ -121,6 +125,9 @@ class ExecutionCreateContainer extends React.Component {
             "files": files
         };
         this.createExecution(data);
+        this.setState({
+            "step": 4
+        });
     }
 
     createExecution(data) {
@@ -131,9 +138,7 @@ class ExecutionCreateContainer extends React.Component {
             const item = data.files[key];
             formData.append("input", item.file, item.fileName);
         }
-        console.log("FROM", formData);
-        // TODO Add sending wait-dialog.
-        // TODO Use better implementation, ie. move to API - action ?
+        // TODO Move to API
         fetch("/api/v1/resources/executions", {
             "method": "POST",
             "body": formData

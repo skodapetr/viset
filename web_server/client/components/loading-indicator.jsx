@@ -1,8 +1,8 @@
 import React from "react";
 
-export const LoadingIndicator = () => (
+export const LoadingIndicator = ({message}) => (
     <div style={{"textAlign": "center"}}>
-        Loading ...
+        {message === undefined ? "Loading ..." : message}
     </div>
 );
 
