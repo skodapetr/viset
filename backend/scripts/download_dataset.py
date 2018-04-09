@@ -13,10 +13,10 @@ Usage example:
 
 from __future__ import print_function
 
-import os
-import json
-import zipfile
 import argparse
+import json
+import os
+import zipfile
 
 __license__ = "X11"
 
@@ -37,8 +37,7 @@ def main():
 
 def parse_argument():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", dest="dataset",
-                        help="Datasets ID.")
+    parser.add_argument("-d", dest="dataset", help="Datasets ID.")
     return vars(parser.parse_args())
 
 
@@ -60,37 +59,37 @@ def download_dataset(dataset):
     # Download molecules.
     url = BASE_URL + dataset["id"] + "/molecules/sdf.zip"
     path = dataset_molecule_dir(dataset["id"])
-    download_and_unpack(url, path)
+    download_and_unpack(url, path, dataset["id"])
 
     # Download selections.
     path = dataset_selection_dir(dataset["id"])
     for selection_id in dataset["selections"]:
         url = dataset_selection_url(dataset["id"], selection_id["id"])
-        download_and_unpack(url, path)
+        download_and_unpack(url, path, dataset["id"] + "_" + selection_id["id"])
 
 
 def dataset_molecule_dir(dataset_id):
-    return _DATA_DIR + "/../data/datasets/" + dataset_id + "/molecules/"
+    return _DATA_DIR + "/datasets/" + dataset_id + "/molecules/"
 
 
 def dataset_selection_dir(dataset_id):
-    return _DATA_DIR + "/../data/datasets/" + dataset_id + "/selections/"
+    return _DATA_DIR + "/datasets/" + dataset_id + "/selections/"
 
 
 def dataset_selection_url(dataset_id, selection_id):
     return BASE_URL + dataset_id + "/selections/" + selection_id + ".zip"
 
 
-def download_and_unpack(url, target_path):
+def download_and_unpack(url, target_path, id):
     """Download file from given URI and unpack it to given directory.
 
     :param url:
     :param target_path:
+    :param id:
     :return:
     """
     # Prepare output and temp directory.
-    temp_file_path = os.path.dirname(os.path.realpath(__file__)) + \
-                     "/../data/temp/download.tmp"
+    temp_file_path = os.path.join(_DATA_DIR, "temp", "download", id + ".zip")
     create_directory(target_path)
     create_directory(os.path.dirname(temp_file_path))
     # Print info.
